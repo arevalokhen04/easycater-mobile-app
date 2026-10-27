@@ -1,0 +1,131 @@
+.hero {
+  padding: 20px 16px 24px;
+  background: linear-gradient(150deg, var(--ion-color-primary) 0%, var(--ion-color-warning) 100%);
+  color: #fff;
+
+  h1 {
+    margin: 0 0 6px;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    margin: 0 0 18px;
+    font-size: 0.9rem;
+    opacity: 0.92;
+  }
+
+  ion-button {
+    --background: #fff;
+    --color: var(--ion-color-primary-dark, #c85f05);
+    --box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+  }
+}
+
+.home-search {
+  --box-shadow: none;
+  --background: #fff;
+  padding: 0 16px 8px;
+  border-radius: 12px;
+}
+
+.dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--ion-color-danger);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+.next {
+  margin: 0 16px;
+}
+
+.carousel {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 0 16px 8px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.pkg {
+  flex: 0 0 240px;
+  margin: 0;
+  scroll-snap-align: start;
+  cursor: pointer;
+
+  .ec-price {
+    margin-top: 8px;
+  }
+}
+
+.pick-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 16px;
+}
+
+.pick {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border-radius: var(--ec-radius-sm);
+  background: var(--ec-surface);
+  box-shadow: 0 1px 6px rgba(28, 27, 32, 0.06);
+
+  img {
+    width: 68px;
+    height: 68px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+}
+
+.pick-info {
+  min-width: 0;
+  flex: 1;
+
+  h4 {
+    margin: 0 0 2px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ec-ink);
+  }
+
+  p {
+    margin: 0 0 4px;
+    font-size: 0.78rem;
+    color: var(--ec-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+  }
+
+  .ec-price {
+    font-size: 0.95rem;
+  }
+}
+
+.footer-space {
+  height: 28px;
+}

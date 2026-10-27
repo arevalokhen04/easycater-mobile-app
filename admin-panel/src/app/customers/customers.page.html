@@ -1,0 +1,76 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start" class="ion-hide-lg">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Customers</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <div class="admin-page" style="padding: 8px 20px 12px">
+      <ion-searchbar
+        placeholder="Search by name or email"
+        (ionInput)="onSearch($any($event).detail.value)"
+      ></ion-searchbar>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="admin-page">
+    <div class="panel">
+      <div class="panel-head"><h2>{{ customers().length }} customer(s)</h2></div>
+      <div class="table-wrap">
+        @if (customers().length === 0) {
+          <div class="empty-row">No customers match your search.</div>
+        } @else {
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Joined</th>
+                <th>Bookings</th>
+                <th>Total spent</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of customers(); track c.id) {
+                <tr>
+                  <td>
+                    <div class="cell-user">
+                      <div class="mini-avatar">{{ initials(c.name) }}</div>
+                      <div class="cell-text">
+                        <strong>{{ c.name }}</strong>
+                        <small>{{ c.email }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ c.phone || '—' }}</td>
+                  <td>{{ c.joinedAt | date: 'MMM d, y' }}</td>
+                  <td>{{ c.bookings }}</td>
+                  <td class="money">{{ money(c.totalSpent) }}</td>
+                  <td>
+                    <span class="tag" [ngClass]="c.isActive ? 'ok' : 'grey'">
+                      {{ c.isActive ? 'active' : 'disabled' }}
+                    </span>
+                  </td>
+                  <td>
+                    <ion-button fill="clear" size="small" (click)="toggleActive(c)">
+                      {{ c.isActive ? 'Disable' : 'Enable' }}
+                    </ion-button>
+                    <ion-button fill="clear" size="small" color="danger" (click)="confirmDelete(c)">
+                      <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                    </ion-button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+  </div>
+</ion-content>

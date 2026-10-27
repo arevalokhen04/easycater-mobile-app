@@ -1,0 +1,88 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/cart" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Payment</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mobile-app-wrapper">
+    @if (cart.hasItems()) {
+    <div class="ec-form-wrap">
+      <div class="amount-card">
+        <span>Amount to pay</span>
+        <strong>{{ currency(amount()) }}</strong>
+        <small>Order total {{ currency(cart.totals().total) }}</small>
+      </div>
+
+      <h2 class="section-title inline">Payment option</h2>
+      <div class="method-list">
+        @for (m of methods; track m.id) {
+          <button
+            type="button"
+            class="method"
+            [class.on]="selectedMethod() === m.id"
+            (click)="selectMethod(m.id)"
+          >
+            <ion-icon [name]="m.icon"></ion-icon>
+            <span class="method-info">
+              <strong>{{ m.label }}</strong>
+              <small>{{ m.hint }}</small>
+            </span>
+            <ion-icon
+              class="check"
+              [name]="selectedMethod() === m.id ? 'radio-button-on' : 'radio-button-off'"
+            ></ion-icon>
+          </button>
+        }
+      </div>
+
+      <h2 class="section-title inline">How much?</h2>
+      <div class="option-row">
+        <button
+          type="button"
+          class="pill"
+          [class.on]="payInFull()"
+          (click)="setPayInFull(true)"
+        >
+          Full amount
+        </button>
+        <button
+          type="button"
+          class="pill"
+          [class.on]="!payInFull()"
+          (click)="setPayInFull(false)"
+        >
+          50% downpayment
+        </button>
+      </div>
+
+      @if (!payInFull()) {
+        <ion-item class="ec-field" lines="none">
+          <ion-label position="stacked">Amount (max {{ currency(cart.totals().total) }})</ion-label>
+          <ion-input
+            type="number"
+            inputmode="numeric"
+            [ngModel]="amount()"
+            (ngModelChange)="amount.set(+$event)"
+            name="amount"
+          ></ion-input>
+        </ion-item>
+      }
+
+      <div class="secure">
+        <ion-icon name="lock-closed-outline"></ion-icon>
+        <span>Payments are processed securely. You will receive a receipt after checkout.</span>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <ion-button class="ec-btn block" expand="block" [disabled]="submitting()" (click)="confirm()">
+        {{ submitting() ? 'Processing...' : 'Pay ' + currency(amount()) }}
+      </ion-button>
+    </div>
+    }
+  </div>
+</ion-content>

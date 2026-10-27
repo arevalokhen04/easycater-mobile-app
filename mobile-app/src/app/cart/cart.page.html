@@ -1,0 +1,114 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/booking" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Order Summary</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mobile-app-wrapper">
+    @if (cart.state().package; as pkg) {
+      <div class="ec-form-wrap">
+        <ion-card class="ec-card pkg-card">
+          <div class="ec-media">
+            <img [src]="pkg.image" [alt]="pkg.name" />
+          </div>
+          <div class="ec-body">
+            <h3 class="ec-title">{{ pkg.name }}</h3>
+            <p class="ec-sub">{{ currency(pkg.pricePerHead) }} per person</p>
+            <div class="ec-total-row">
+              <span>{{ cart.state().guestCount }} guests &times; {{ currency(pkg.pricePerHead) }}</span>
+              <span>{{ currency(packageLineTotal()) }}</span>
+            </div>
+          </div>
+        </ion-card>
+
+        @if (cart.state().addOns.length > 0) {
+          <h2 class="section-title inline">Add-ons</h2>
+          <div class="addons">
+            @for (addon of cart.state().addOns; track addon.menuItemId) {
+              <div class="addon">
+                <div>
+                  <strong>{{ addon.name }}</strong>
+                  <span>{{ addon.quantity }} &times; {{ currency(addon.price) }}</span>
+                </div>
+                <div class="row">
+                  <strong>{{ currency(addon.quantity * addon.price) }}</strong>
+                  <ion-button
+                    fill="clear"
+                    color="danger"
+                    size="small"
+                    (click)="removeAddon(addon.menuItemId, addon.name)"
+                    aria-label="Remove addon"
+                  >
+                    <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                  </ion-button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <h2 class="section-title inline">Event details</h2>
+        <ion-list class="ec-plain">
+          <ion-item lines="none">
+            <ion-icon name="calendar-outline" slot="start"></ion-icon>
+            <ion-label>
+              <h3>Date & time</h3>
+              <p>
+                {{ cart.state().eventDate | date: 'MMM d, y' }} &middot; {{ cart.state().eventTime }}
+              </p>
+            </ion-label>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-icon name="location-outline" slot="start"></ion-icon>
+            <ion-label>
+              <h3>Venue</h3>
+              <p>{{ cart.state().venue || 'To be confirmed' }}</p>
+            </ion-label>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-icon name="people-outline" slot="start"></ion-icon>
+            <ion-label>
+              <h3>Guests</h3>
+              <p>{{ cart.state().guestCount }} people</p>
+            </ion-label>
+          </ion-item>
+          @if (cart.state().notes) {
+            <ion-item lines="none">
+              <ion-icon name="chatbox-ellipses-outline" slot="start"></ion-icon>
+              <ion-label>
+                <h3>Notes</h3>
+                <p>{{ cart.state().notes }}</p>
+              </ion-label>
+            </ion-item>
+          }
+        </ion-list>
+
+        <h2 class="section-title inline">Totals</h2>
+        <ion-card class="ec-card totals">
+          <div class="ec-total-row">
+            <span>Package</span><span>{{ currency(cart.totals().subtotal) }}</span>
+          </div>
+          <div class="ec-total-row">
+            <span>Service charge (10%)</span><span>{{ currency(cart.totals().serviceCharge) }}</span>
+          </div>
+          <div class="ec-total-row">
+            <span>VAT (12%)</span><span>{{ currency(cart.totals().tax) }}</span>
+          </div>
+          <div class="ec-total-row grand">
+            <span>Total</span><span>{{ currency(cart.totals().total) }}</span>
+          </div>
+        </ion-card>
+      </div>
+
+      <div class="action-bar">
+        <ion-button class="ec-btn block" expand="block" (click)="proceed()">
+          Proceed to Payment
+        </ion-button>
+      </div>
+    }
+  </div>
+</ion-content>

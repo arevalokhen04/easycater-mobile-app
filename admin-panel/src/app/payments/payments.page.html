@@ -1,0 +1,100 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start" class="ion-hide-lg">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Payments</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <div class="admin-page" style="padding: 8px 20px 12px">
+      <div class="chips">
+        @for (s of statuses; track s) {
+          <button type="button" class="chip" [class.on]="activeStatus() === s" (click)="setStatus(s)">
+            {{ s === 'all' ? 'All' : (s | titlecase) }}
+          </button>
+        }
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="admin-page">
+    <div class="grid kpi" style="margin-bottom: 16px">
+      <div class="kpi-card green">
+        <div class="kpi-icon"><ion-icon name="checkmark-circle-outline"></ion-icon></div>
+        <div>
+          <div class="kpi-value">{{ money(totalPaid) }}</div>
+          <div class="kpi-label">Collected</div>
+        </div>
+      </div>
+      <div class="kpi-card blue">
+        <div class="kpi-icon"><ion-icon name="arrow-undo-outline"></ion-icon></div>
+        <div>
+          <div class="kpi-value">{{ money(totalRefunded) }}</div>
+          <div class="kpi-label">Refunded</div>
+        </div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-icon"><ion-icon name="receipt-outline"></ion-icon></div>
+        <div>
+          <div class="kpi-value">{{ payments().length }}</div>
+          <div class="kpi-label">Transactions</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>Transactions</h2></div>
+      <div class="table-wrap">
+        @if (payments().length === 0) {
+          <div class="empty-row">No payments with this status.</div>
+        } @else {
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Booking</th>
+                <th>Customer</th>
+                <th>Method</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of payments(); track p.id) {
+                <tr>
+                  <td class="mono">{{ p.referenceNumber }}</td>
+                  <td class="mono">{{ p.bookingNumber }}</td>
+                  <td class="strong">{{ p.customerName }}</td>
+                  <td>
+                    <span class="method">
+                      <ion-icon [name]="methodIcon(p.method)"></ion-icon>
+                      {{ p.method }}
+                    </span>
+                  </td>
+                  <td class="money" [class.neg]="p.amount < 0">{{ money(p.amount) }}</td>
+                  <td>{{ p.paidAt | date: 'MMM d, y' }}</td>
+                  <td><span class="tag" [ngClass]="statusClass(p.status)">{{ p.status }}</span></td>
+                  <td>
+                    @if (p.status === 'pending') {
+                      <ion-button fill="clear" size="small" (click)="verify(p)">Verify</ion-button>
+                    }
+                    @if (p.status === 'paid') {
+                      <ion-button fill="clear" size="small" color="medium" (click)="refund(p)">
+                        Refund
+                      </ion-button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+  </div>
+</ion-content>

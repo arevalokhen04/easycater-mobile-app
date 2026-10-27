@@ -1,0 +1,60 @@
+<ion-content [fullscreen]="true">
+  <div class="mobile-app-wrapper">
+    <div class="auth">
+    <div class="brand">
+      <div class="logo">
+        <ion-icon name="restaurant"></ion-icon>
+      </div>
+      <h1>EasyCater</h1>
+      <p>Book your event catering in minutes.</p>
+    </div>
+
+    <div class="form">
+      <ion-item class="ec-field" lines="none">
+        <ion-label position="stacked">Email</ion-label>
+        <ion-input
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          placeholder="you@email.com"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+          name="email"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item class="ec-field" lines="none">
+        <ion-label position="stacked">Password</ion-label>
+        <ion-input
+          [type]="showPassword ? 'text' : 'password'"
+          autocomplete="current-password"
+          placeholder="Enter your password"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+          name="password"
+        ></ion-input>
+        <ion-button
+          fill="clear"
+          slot="end"
+          type="button"
+          (click)="showPassword = !showPassword"
+          [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+        >
+          <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <ion-button class="ec-btn block" expand="block" (click)="submit()">Sign In</ion-button>
+
+      <ion-button fill="clear" size="small" type="button" (click)="useDemoAccount()">
+        Use demo account
+      </ion-button>
+
+      <div class="alt">
+        <span>New to EasyCater?</span>
+        <a routerLink="/register">Create an account</a>
+      </div>
+    </div>
+  </div>
+  </div>
+</ion-content>

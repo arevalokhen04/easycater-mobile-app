@@ -1,0 +1,32 @@
+.method-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 40px;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+
+  strong {
+    text-align: right;
+    font-size: 0.9rem;
+    color: var(--ec-ink);
+  }
+}
+
+.method-name {
+  font-size: 0.86rem;
+  color: var(--ec-ink);
+  text-transform: capitalize;
+}
+
+.track {
+  height: 8px;
+  border-radius: 999px;
+  background: #eeeef3;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--ion-color-primary), var(--ion-color-warning));
+}

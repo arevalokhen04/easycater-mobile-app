@@ -1,0 +1,131 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start" class="ion-hide-lg">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Reports</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="admin-page">
+    <div class="page-head">
+      <div>
+        <h1>Reports</h1>
+        <p>Sales performance, top packages and customer value.</p>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <ion-skeleton-text [animated]="true" style="width: 100%; height: 260px"></ion-skeleton-text>
+    } @else if (report(); as report) {
+      <div class="grid kpi">
+        <div class="kpi-card green">
+          <div class="kpi-icon"><ion-icon name="cash-outline"></ion-icon></div>
+          <div>
+            <div class="kpi-value">{{ money(report.revenue) }}</div>
+            <div class="kpi-label">Total revenue</div>
+          </div>
+        </div>
+        <div class="kpi-card blue">
+          <div class="kpi-icon"><ion-icon name="receipt-outline"></ion-icon></div>
+          <div>
+            <div class="kpi-value">{{ report.payments }}</div>
+            <div class="kpi-label">Payments</div>
+          </div>
+        </div>
+        <div class="kpi-card amber">
+          <div class="kpi-icon"><ion-icon name="cube-outline"></ion-icon></div>
+          <div>
+            <div class="kpi-value">{{ report.byPackage.length }}</div>
+            <div class="kpi-label">Packages sold</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 16px">
+        <div class="panel-head"><h2>Monthly revenue</h2></div>
+        <div class="panel-body">
+          <div class="bars">
+            @for (point of trend(); track point.label) {
+              <div class="bar-col">
+                <span class="bar-value">{{ point.revenue | currency: 'PHP' : 'symbol' : '1.0-0' }}</span>
+                <div class="bar" [style.height.%]="barHeight(point.revenue)"></div>
+                <span class="bar-label">{{ point.label }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="grid two" style="margin-top: 16px">
+        <div class="panel">
+          <div class="panel-head"><h2>Sales by package</h2></div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr><th>Package</th><th>Category</th><th>Bookings</th><th>Revenue</th></tr>
+              </thead>
+              <tbody>
+                @for (p of report.byPackage; track p.name) {
+                  <tr>
+                    <td class="strong">{{ p.name }}</td>
+                    <td>{{ p.category | titlecase }}</td>
+                    <td>{{ p.bookings }}</td>
+                    <td class="money">{{ money(p.revenue) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>Payment methods</h2></div>
+          <div class="panel-body">
+            @for (entry of methodEntries(); track entry.method) {
+              <div class="method-row">
+                <span class="method-name">{{ entry.method | titlecase }}</span>
+                <div class="track">
+                  <div
+                    class="fill"
+                    [style.width.%]="(entry.count / maxMethodCount()) * 100"
+                  ></div>
+                </div>
+                <strong>{{ entry.count }}</strong>
+              </div>
+            }
+            @if (methodEntries().length === 0) {
+              <div class="empty-row">No payments recorded yet.</div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 16px">
+        <div class="panel-head"><h2>Top customers</h2></div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr><th>Customer</th><th>Bookings</th><th>Total spend</th></tr>
+            </thead>
+            <tbody>
+              @for (c of topCustomers(); track c.email) {
+                <tr>
+                  <td>
+                    <div class="cell-text">
+                      <strong>{{ c.name }}</strong>
+                      <small>{{ c.email }}</small>
+                    </div>
+                  </td>
+                  <td>{{ c.bookings }}</td>
+                  <td class="money">{{ money(c.spend) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</ion-content>

@@ -1,0 +1,122 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/packages" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Book Your Event</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mobile-app-wrapper">
+    <div class="ec-form-wrap">
+    @if (cart.state().package; as pkg) {
+      <ion-card class="ec-card chosen">
+        <div class="row">
+          <img [src]="pkg.image" [alt]="pkg.name" />
+          <div class="chosen-info">
+            <strong>{{ pkg.name }}</strong>
+            <span>{{ pkg.pricePerHead | currency: 'PHP' : 'symbol' : '1.0-0' }} / person</span>
+          </div>
+        </div>
+      </ion-card>
+
+      <h2 class="section-title inline">Event type</h2>
+      <div class="pill-grid">
+        @for (t of eventTypes; track t.key) {
+          <button
+            type="button"
+            class="pill"
+            [class.on]="eventType() === t.key"
+            (click)="setEventType(t.key)"
+          >
+            {{ t.label }}
+          </button>
+        }
+      </div>
+
+      <h2 class="section-title inline">Event date</h2>
+      <ion-item class="ec-field" lines="none">
+        <ion-label position="stacked">Date</ion-label>
+        <ion-input type="date" [min]="minDate" [ngModel]="eventDate()" (ngModelChange)="eventDate.set($event)" name="eventDate"></ion-input>
+      </ion-item>
+
+      <h2 class="section-title inline">Service time</h2>
+      <div class="pill-grid">
+        @for (slot of timeSlots; track slot) {
+          <button
+            type="button"
+            class="pill"
+            [class.on]="eventTime() === slot"
+            (click)="setEventTime(slot)"
+          >
+            {{ slot }}
+          </button>
+        }
+      </div>
+
+      <h2 class="section-title inline">Guest count</h2>
+      <div class="guest-box">
+        <div>
+          <span class="label">Guests ({{ pkg.minGuests }}&ndash;{{ pkg.maxGuests }})</span>
+          <strong class="count">{{ cart.state().guestCount }}</strong>
+        </div>
+        <div class="stepper">
+          <ion-button
+            fill="outline"
+            size="small"
+            (click)="changeGuests(-5)"
+            [disabled]="cart.state().guestCount <= pkg.minGuests"
+          >
+            <ion-icon slot="icon-only" name="remove"></ion-icon>
+          </ion-button>
+          <ion-button
+            fill="outline"
+            size="small"
+            (click)="changeGuests(5)"
+            [disabled]="cart.state().guestCount >= pkg.maxGuests"
+          >
+            <ion-icon slot="icon-only" name="add"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <h2 class="section-title inline">Venue</h2>
+      <ion-item class="ec-field" lines="none">
+        <ion-label position="stacked">Venue name</ion-label>
+        <ion-input
+          placeholder="Grand Ballroom, Sapphire Hotel"
+          [ngModel]="venue()"
+          (ngModelChange)="venue.set($event)"
+          name="venue"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item class="ec-field" lines="none">
+        <ion-label position="stacked">Address</ion-label>
+        <ion-input
+          placeholder="Street, city"
+          [ngModel]="address()"
+          (ngModelChange)="address.set($event)"
+          name="address"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item class="ec-field" lines="none">
+        <ion-label position="stacked">Special requests (optional)</ion-label>
+        <ion-textarea
+          rows="3"
+          placeholder="Allergies, dietary needs, setup notes..."
+          [ngModel]="notes()"
+          (ngModelChange)="notes.set($event)"
+          name="notes"
+        ></ion-textarea>
+      </ion-item>
+
+      <ion-button class="ec-btn block" expand="block" (click)="reviewOrder()">
+        Review Order
+      </ion-button>
+    }
+  </div>
+  </div>
+</ion-content>

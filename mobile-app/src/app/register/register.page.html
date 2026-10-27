@@ -1,0 +1,92 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button routerLink="/login" defaultHref="/login" fill="clear" color="medium">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Create Account</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mobile-app-wrapper">
+    <div class="ec-form-wrap">
+    <p class="intro">Sign up to start booking your event catering.</p>
+
+    <ion-item class="ec-field" lines="none">
+      <ion-label position="stacked">Full name</ion-label>
+      <ion-input placeholder="Juan Dela Cruz" [ngModel]="name()" (ngModelChange)="name.set($event)" name="name"></ion-input>
+    </ion-item>
+
+    <ion-item class="ec-field" lines="none">
+      <ion-label position="stacked">Email</ion-label>
+      <ion-input
+        type="email"
+        inputmode="email"
+        placeholder="you@email.com"
+        [ngModel]="email()"
+        (ngModelChange)="email.set($event)"
+        name="email"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item class="ec-field" lines="none">
+      <ion-label position="stacked">Mobile number (optional)</ion-label>
+      <ion-input
+        type="tel"
+        inputmode="tel"
+        placeholder="+63 917 000 0000"
+        [ngModel]="phone()"
+        (ngModelChange)="phone.set($event)"
+        name="phone"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item class="ec-field" lines="none">
+      <ion-label position="stacked">Password</ion-label>
+      <ion-input
+        [type]="showPassword ? 'text' : 'password'"
+        placeholder="At least 8 characters"
+        [ngModel]="password()"
+        (ngModelChange)="password.set($event)"
+        name="password"
+      ></ion-input>
+      <ion-button
+        fill="clear"
+        slot="end"
+        type="button"
+        (click)="showPassword = !showPassword"
+        [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+      >
+        <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+      </ion-button>
+    </ion-item>
+
+    <ion-item class="ec-field" lines="none">
+      <ion-label position="stacked">Confirm password</ion-label>
+      <ion-input
+        [type]="showPassword ? 'text' : 'password'"
+        placeholder="Re-enter your password"
+        [ngModel]="confirmPassword()"
+        (ngModelChange)="confirmPassword.set($event)"
+        name="confirmPassword"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item lines="none" class="terms">
+      <ion-checkbox slot="start" [(ngModel)]="agreed" name="agreed" aria-label="Accept terms"></ion-checkbox>
+      <ion-label class="ion-text-wrap">
+        I agree to the Terms of Service and Privacy Policy.
+      </ion-label>
+    </ion-item>
+
+    <ion-button class="ec-btn block" expand="block" (click)="submit()">Create Account</ion-button>
+
+    <div class="alt">
+      <span>Already have an account?</span>
+      <a routerLink="/login">Sign in</a>
+    </div>
+  </div>
+  </div>
+</ion-content>

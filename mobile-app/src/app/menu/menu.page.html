@@ -1,0 +1,83 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" routerLink="/cart">
+        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+        @if (cart.addOnCount() > 0) {
+          <span class="dot">{{ cart.addOnCount() }}</span>
+        }
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Menu</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" routerLink="/cart">Review Order</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Search dishes"
+      (ionInput)="onSearch($any($event).detail.value)"
+    ></ion-searchbar>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <div class="ec-chip-row">
+      <ion-chip [outline]="activeCategory() !== 'all'" color="primary" (click)="selectCategory('all')">
+        All
+      </ion-chip>
+      @for (cat of categories; track cat) {
+        <ion-chip
+          [outline]="activeCategory() !== cat"
+          [color]="activeCategory() === cat ? 'primary' : 'medium'"
+          (click)="selectCategory(cat)"
+        >
+          {{ label(cat) }}
+        </ion-chip>
+      }
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mobile-app-wrapper">
+    @if (!cart.hasItems()) {
+    <div class="hint">
+      <ion-icon name="information-circle-outline"></ion-icon>
+      <span>Choose a package first &mdash; extras you add here will attach to it.</span>
+    </div>
+  }
+
+  @if (items().length === 0) {
+    <div class="ec-empty">
+      <ion-icon name="restaurant-outline"></ion-icon>
+      <h3>Nothing here yet</h3>
+      <p>No dishes match your search.</p>
+    </div>
+  } @else {
+    <div class="page-pad stack">
+      @for (item of items(); track item.id) {
+        <div class="dish">
+          <img [src]="item.image" [alt]="item.name" loading="lazy" />
+          <div class="dish-info">
+            <div class="row-between">
+              <h3>{{ item.name }}</h3>
+              @if (quantityOf(item.id) > 0) {
+                <span class="qty">{{ quantityOf(item.id) }}x</span>
+              }
+            </div>
+            <p>{{ item.description }}</p>
+            <div class="row-between foot">
+              <span class="ec-price">{{ currency(item.price) }}</span>
+              <ion-button size="small" class="ec-btn" (click)="addToCart(item)">
+                <ion-icon slot="start" name="add"></ion-icon>
+                Add
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+  </div>
+</ion-content>

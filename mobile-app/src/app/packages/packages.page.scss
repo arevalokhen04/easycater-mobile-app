@@ -1,0 +1,30 @@
+.ec-chip-row {
+  padding: 4px 0 10px;
+}
+
+ion-chip {
+  --border-radius: 999px;
+  font-weight: 600;
+}
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ion-color-warning);
+
+  ion-icon {
+    font-size: 14px;
+  }
+}
+
+.meta {
+  margin-top: 10px;
+}
+
+.range {
+  font-size: 0.78rem;
+  color: var(--ec-muted);
+}

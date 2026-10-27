@@ -1,0 +1,124 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Profile</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="startEdit()" aria-label="Edit profile">
+        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mobile-app-wrapper">
+    @if (user; as u) {
+    <div class="head">
+      <div class="avatar">{{ initials }}</div>
+      <h1>{{ u.name }}</h1>
+      <p>{{ u.email }}</p>
+      @if (u.phone) {
+        <span class="phone">{{ u.phone }}</span>
+      }
+    </div>
+
+    @if (editing()) {
+      <div class="ec-form-wrap">
+        <ion-item class="ec-field" lines="none">
+          <ion-label position="stacked">Full name</ion-label>
+          <ion-input [ngModel]="editName()" (ngModelChange)="editName.set($event)" name="editName"></ion-input>
+        </ion-item>
+        <ion-item class="ec-field" lines="none">
+          <ion-label position="stacked">Mobile number</ion-label>
+          <ion-input type="tel" [ngModel]="editPhone()" (ngModelChange)="editPhone.set($event)" name="editPhone"></ion-input>
+        </ion-item>
+        <ion-item class="ec-field" lines="none">
+          <ion-label position="stacked">Address</ion-label>
+          <ion-input [ngModel]="editAddress()" (ngModelChange)="editAddress.set($event)" name="editAddress"></ion-input>
+        </ion-item>
+        <ion-button class="ec-btn block" expand="block" (click)="saveEdit()">Save changes</ion-button>
+        <ion-button fill="clear" block (click)="editing.set(false)">Cancel</ion-button>
+      </div>
+    } @else {
+      <div class="stats">
+        <div class="stat">
+          <strong>{{ stats().total }}</strong>
+          <span>Bookings</span>
+        </div>
+        <div class="stat">
+          <strong>{{ stats().upcoming }}</strong>
+          <span>Upcoming</span>
+        </div>
+        <div class="stat">
+          <strong>{{ stats().spent | currency: 'PHP' : 'symbol' : '1.0-0' }}</strong>
+          <span>Paid</span>
+        </div>
+      </div>
+
+      <h2 class="section-title">Notifications</h2>
+      @if (notifications().length === 0) {
+        <div class="ec-empty">
+          <ion-icon name="notifications-off-outline"></ion-icon>
+          <h3>Nothing new</h3>
+          <p>Booking and payment updates will appear here.</p>
+        </div>
+      } @else {
+        <div class="notif-list">
+          @for (n of notifications(); track n.id) {
+            <div class="notif" [class.unread]="!n.isRead">
+              <div class="notif-icon">
+                <ion-icon
+                  [name]="
+                    n.type === 'booking'
+                      ? 'calendar-outline'
+                      : n.type === 'payment'
+                        ? 'card-outline'
+                        : n.type === 'promo'
+                          ? 'pricetag-outline'
+                          : 'information-circle-outline'
+                  "
+                ></ion-icon>
+              </div>
+              <div class="notif-body">
+                <div class="row-between">
+                  <strong>{{ n.title }}</strong>
+                  <span class="time">{{ relativeTime(n.createdAt) }}</span>
+                </div>
+                <p>{{ n.message }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <h2 class="section-title">Account</h2>
+      <ion-list class="ec-plain account">
+        <ion-item button [routerLink]="'/tabs/bookings'">
+          <ion-icon name="calendar-outline" slot="start"></ion-icon>
+          <ion-label>My bookings</ion-label>
+        </ion-item>
+        <ion-item button [routerLink]="'/tabs/packages'">
+          <ion-icon name="grid-outline" slot="start"></ion-icon>
+          <ion-label>Browse packages</ion-label>
+        </ion-item>
+        <ion-item button [routerLink]="'/tabs/menu'">
+          <ion-icon name="restaurant-outline" slot="start"></ion-icon>
+          <ion-label>Menu</ion-label>
+        </ion-item>
+        <ion-item button (click)="logout()">
+          <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
+          <ion-label color="danger">Log out</ion-label>
+        </ion-item>
+      </ion-list>
+
+      <p class="version">EasyCater v1.0.0</p>
+    }
+  } @else {
+    <div class="ec-empty">
+      <ion-icon name="person-circle-outline"></ion-icon>
+      <h3>Not signed in</h3>
+      <p>Log in to manage your bookings.</p>
+      <ion-button routerLink="/login">Go to login</ion-button>
+    </div>
+  }
+  </div>
+</ion-content>

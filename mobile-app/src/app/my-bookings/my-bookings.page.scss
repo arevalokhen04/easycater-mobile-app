@@ -1,0 +1,59 @@
+.ec-chip-row {
+  padding: 4px 0 10px;
+}
+
+ion-chip {
+  --border-radius: 999px;
+  font-weight: 600;
+}
+
+.booking .ec-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ref {
+  margin: 0;
+  font-size: 0.74rem;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  color: var(--ec-muted);
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    color: var(--ec-ink);
+  }
+
+  ion-icon {
+    font-size: 14px;
+    color: var(--ion-color-primary);
+  }
+}
+
+.venue {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--ec-muted);
+
+  ion-icon {
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+}
+
+.foot {
+  margin-top: 2px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f4;
+}

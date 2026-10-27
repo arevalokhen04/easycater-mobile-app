@@ -1,0 +1,128 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start" class="ion-hide-lg">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Dashboard</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="admin-page">
+    <div class="page-head">
+      <div>
+        <h1>Welcome back, {{ adminName }}</h1>
+        <p>Here's how EasyCater is performing.</p>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <div class="grid kpi">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <ion-skeleton-text [animated]="true" style="width: 100%; height: 86px"></ion-skeleton-text>
+        }
+      </div>
+    } @else if (summary(); as summary) {
+      <div class="grid kpi">
+        <div class="kpi-card">
+          <div class="kpi-icon"><ion-icon name="cash-outline"></ion-icon></div>
+          <div>
+            <div class="kpi-value">{{ money(summary.totalRevenue) }}</div>
+            <div class="kpi-label">Revenue</div>
+          </div>
+        </div>
+
+        <div class="kpi-card blue">
+          <div class="kpi-icon"><ion-icon name="calendar-outline"></ion-icon></div>
+          <div>
+            <div class="kpi-value">{{ summary.totalBookings }}</div>
+            <div class="kpi-label">Total bookings</div>
+          </div>
+        </div>
+
+        <div class="kpi-card amber">
+          <div class="kpi-icon"><ion-icon name="hourglass-outline"></ion-icon></div>
+          <div>
+            <div class="kpi-value">{{ summary.pendingBookings }}</div>
+            <div class="kpi-label">Pending</div>
+          </div>
+        </div>
+
+        <div class="kpi-card green">
+          <div class="kpi-icon"><ion-icon name="people-outline"></ion-icon></div>
+          <div>
+            <div class="kpi-value">{{ summary.totalCustomers }}</div>
+            <div class="kpi-label">Customers</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid two" style="margin-top: 16px">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Revenue trend</h2>
+            <span class="mono">last 6 months</span>
+          </div>
+          <div class="panel-body">
+            <div class="bars">
+              @for (point of summary.revenueTrend; track point.label) {
+                <div class="bar-col">
+                  <span class="bar-value">{{ point.revenue | currency: 'PHP' : 'symbol' : '1.0-0' }}</span>
+                  <div class="bar" [style.height.%]="barHeight(point.revenue)"></div>
+                  <span class="bar-label">{{ point.label }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Catalogue</h2>
+          </div>
+          <div class="panel-body">
+            <div class="row-between"><span>Active packages</span><strong>{{ summary.activePackages }}</strong></div>
+            <div class="row-between"><span>Available menu items</span><strong>{{ summary.activeMenuItems }}</strong></div>
+            <div class="row-between"><span>Upcoming events</span><strong>{{ summary.upcomingBookings }}</strong></div>
+            <div class="row-between"><span>Pending requests</span><strong>{{ summary.pendingBookings }}</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 16px">
+        <div class="panel-head">
+          <h2>Recent bookings</h2>
+          <ion-button fill="clear" size="small" routerLink="/bookings">View all</ion-button>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Customer</th>
+                <th>Package</th>
+                <th>Event date</th>
+                <th>Guests</th>
+                <th>Total</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (b of summary.recentBookings; track b.id) {
+                <tr>
+                  <td class="mono">{{ b.bookingNumber }}</td>
+                  <td class="strong">{{ b.customerName }}</td>
+                  <td>{{ b.packageName }}</td>
+                  <td>{{ b.eventDate | date: 'MMM d, y' }}</td>
+                  <td>{{ b.guestCount }}</td>
+                  <td class="money">{{ money(b.total) }}</td>
+                  <td><span class="tag" [ngClass]="statusClass(b.status)">{{ b.status }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</ion-content>

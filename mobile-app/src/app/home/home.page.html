@@ -1,0 +1,88 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>EasyCater</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/tabs/profile" fill="clear">
+        <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+        @if (unread > 0) {
+          <span class="dot" [attr.data-count]="unread"></span>
+        }
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-searchbar
+      class="home-search"
+      placeholder="Search packages and menus"
+      (ionInput)="router.navigate(['/tabs/packages'], { queryParams: { q: $any($event).detail.value } })"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mobile-app-wrapper">
+    <div class="hero">
+    <h1>{{ greeting }}</h1>
+    <p>Let's plan something delicious for your next event.</p>
+    <ion-button class="ec-btn" expand="block" routerLink="/tabs/packages" routerDirection="forward">
+      Browse Packages
+    </ion-button>
+  </div>
+
+  @if (nextBooking(); as next) {
+    <h2 class="section-title">Next event</h2>
+    <ion-card class="ec-card next" routerLink="/tabs/bookings">
+      <div class="ec-media">
+        <img [src]="next.packageImage" [alt]="next.packageName" />
+        <span class="ec-badge soon ec-icon-pill">Upcoming</span>
+      </div>
+      <div class="ec-body">
+        <h3 class="ec-title">{{ next.packageName }}</h3>
+        <p class="ec-sub">
+          {{ next.eventDate | date: 'MMM d, y' }} &middot; {{ next.eventTime }} &middot;
+          {{ next.guestCount }} guests
+        </p>
+      </div>
+    </ion-card>
+  }
+
+  <h2 class="section-title">Popular packages</h2>
+  @if (loading()) {
+    <div class="page-pad"><ion-skeleton-text [animated]="true" style="width: 100%; height: 120px"></ion-skeleton-text></div>
+  } @else {
+    <div class="carousel">
+      @for (pkg of popular(); track pkg.id) {
+        <ion-card class="ec-card pkg" (click)="openPackage(pkg)">
+          <div class="ec-media">
+            <img [src]="pkg.image" [alt]="pkg.name" loading="lazy" />
+          </div>
+          <div class="ec-body">
+            <h3 class="ec-title">{{ pkg.name }}</h3>
+            <p class="ec-sub">{{ pkg.category | titlecase }}</p>
+            <div class="ec-price">
+              {{ currency(pkg.pricePerHead) }} <small>/ pax</small>
+            </div>
+          </div>
+        </ion-card>
+      }
+    </div>
+  }
+
+  <h2 class="section-title">Chef's picks</h2>
+  <div class="pick-list">
+    @for (item of featured(); track item.id) {
+      <div class="pick">
+        <img [src]="item.image" [alt]="item.name" loading="lazy" />
+        <div class="pick-info">
+          <h4>{{ item.name }}</h4>
+          <p>{{ item.description }}</p>
+          <span class="ec-price">{{ currency(item.price) }}</span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="footer-space"></div>
+  </div>
+</ion-content>

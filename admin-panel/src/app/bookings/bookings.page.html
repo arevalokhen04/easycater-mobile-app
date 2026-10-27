@@ -1,0 +1,89 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start" class="ion-hide-lg">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Bookings</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <div class="admin-page" style="padding: 8px 20px 12px">
+      <div class="chips">
+        @for (s of statuses; track s) {
+          <button type="button" class="chip" [class.on]="activeStatus() === s" (click)="setStatus(s)">
+            {{ s === 'all' ? 'All' : (s | titlecase) }}
+          </button>
+        }
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="admin-page">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>{{ bookings().length }} booking(s)</h2>
+      </div>
+      <div class="table-wrap">
+        @if (bookings().length === 0) {
+          <div class="empty-row">No bookings with this status.</div>
+        } @else {
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Customer</th>
+                <th>Package</th>
+                <th>Event</th>
+                <th>Guests</th>
+                <th>Venue</th>
+                <th>Total</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (b of bookings(); track b.id) {
+                <tr>
+                  <td class="mono">{{ b.bookingNumber }}</td>
+                  <td>
+                    <div class="cell-user">
+                      <div class="mini-avatar">{{ initials(b.customerName) }}</div>
+                      <div class="cell-text">
+                        <strong>{{ b.customerName }}</strong>
+                        <small>{{ b.customerEmail }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="wrap">{{ b.packageName }}</td>
+                  <td>
+                    {{ b.eventDate | date: 'MMM d, y' }}
+                    <small class="mono" style="display: block">{{ b.eventTime }}</small>
+                  </td>
+                  <td>{{ b.guestCount }}</td>
+                  <td class="wrap">{{ b.venue }}</td>
+                  <td class="money">{{ money(b.total) }}</td>
+                  <td>
+                    <span class="tag" [ngClass]="b.paymentStatus === 'paid' ? 'ok' : 'wait'">
+                      {{ b.paymentStatus }}
+                    </span>
+                  </td>
+                  <td><span class="tag" [ngClass]="statusClass(b.status)">{{ b.status }}</span></td>
+                  <td>
+                    @if (nextStatus(b.status); as next) {
+                      <ion-button fill="clear" size="small" (click)="updateStatus(b, next)">
+                        &rarr; {{ next }}
+                      </ion-button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+  </div>
+</ion-content>

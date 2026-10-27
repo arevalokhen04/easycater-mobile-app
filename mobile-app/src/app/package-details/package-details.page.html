@@ -1,0 +1,100 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/packages" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Package Details</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mobile-app-wrapper">
+    @if (loading()) {
+    <div class="page-pad">
+      <ion-skeleton-text [animated]="true" style="width: 100%; height: 200px"></ion-skeleton-text>
+    </div>
+  } @else if (pkg(); as pkg) {
+    <div class="ec-media hero">
+      <img [src]="pkg.image" [alt]="pkg.name" />
+      @if (pkg.isPopular) {
+        <span class="ec-badge hot ec-icon-pill">Popular</span>
+      }
+    </div>
+
+    <div class="detail">
+      <div class="row-between">
+        <h1>{{ pkg.name }}</h1>
+        <span class="rating">
+          <ion-icon name="star"></ion-icon>{{ pkg.rating }}
+        </span>
+      </div>
+
+      <p class="ec-sub">{{ pkg.description }}</p>
+
+      <div class="ec-price big">
+        {{ currency(pkg.pricePerHead) }} <small>/ person</small>
+      </div>
+
+      <div class="specs">
+        <div class="spec">
+          <ion-icon name="people-outline"></ion-icon>
+          <div>
+            <strong>{{ pkg.minGuests }}&ndash;{{ pkg.maxGuests }}</strong>
+            <span>Guests</span>
+          </div>
+        </div>
+        <div class="spec">
+          <ion-icon name="pricetag-outline"></ion-icon>
+          <div>
+            <strong>{{ pkg.category | titlecase }}</strong>
+            <span>Event type</span>
+          </div>
+        </div>
+        <div class="spec">
+          <ion-icon name="sparkles-outline"></ion-icon>
+          <div>
+            <strong>{{ pkg.inclusions.length }}</strong>
+            <span>Inclusions</span>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="section-title inline">What's included</h2>
+      <ion-list class="ec-plain">
+        @for (item of pkg.inclusions; track item) {
+          <ion-item lines="none">
+            <ion-icon name="checkmark-circle" color="success" slot="start"></ion-icon>
+            <ion-label>{{ item }}</ion-label>
+          </ion-item>
+        }
+      </ion-list>
+
+      <h2 class="section-title inline">Estimated cost</h2>
+      <div class="guest-box">
+        <div>
+          <span class="label">Number of guests</span>
+          <strong class="count">{{ guestCount() }}</strong>
+        </div>
+        <div class="stepper">
+          <ion-button fill="outline" size="small" (click)="changeGuests(-5)" [disabled]="guestCount() <= pkg.minGuests">
+            <ion-icon slot="icon-only" name="remove"></ion-icon>
+          </ion-button>
+          <ion-button fill="outline" size="small" (click)="changeGuests(5)" [disabled]="guestCount() >= pkg.maxGuests">
+            <ion-icon slot="icon-only" name="add"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <div class="ec-total-row grand">
+        <span>Estimated total</span>
+        <span>{{ currency(estimatedTotal) }}</span>
+      </div>
+      <p class="note">Excludes 10% service charge and 12% tax, added at checkout.</p>
+    </div>
+
+    <div class="action-bar">
+      <ion-button class="ec-btn block" expand="block" (click)="book()">Book This Package</ion-button>
+    </div>
+  }
+  </div>
+</ion-content>

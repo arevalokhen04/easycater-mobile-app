@@ -1,0 +1,24 @@
+node_modules/
+dist/
+www/
+.angular/
+.output/
+
+.env
+.env.local
+*.log
+
+# Native builds
+mobile-app/android/
+mobile-app/ios/
+admin-panel/android/
+admin-panel/ios/
+
+# Uploaded assets
+backend-api/uploads/*
+!backend-api/uploads/.gitkeep
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

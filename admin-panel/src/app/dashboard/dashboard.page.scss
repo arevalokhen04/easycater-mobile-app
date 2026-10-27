@@ -1,0 +1,19 @@
+.row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f2f2f6;
+  font-size: 0.88rem;
+  color: var(--ec-ink);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  strong {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--ion-color-primary);
+  }
+}

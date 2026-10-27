@@ -1,0 +1,52 @@
+<ion-app>
+  <ion-split-pane contentId="admin-content" when="lg">
+    <ion-menu contentId="admin-content" type="overlay">
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>EasyCater</ion-title>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content>
+        <ion-list lines="none">
+          <ion-list-header>Manage</ion-list-header>
+
+          @for (link of links; track link.path) {
+            <ion-item
+              button
+              [routerLink]="link.path"
+              routerLinkActive="selected"
+              [routerLinkActiveOptions]="{ exact: false }"
+              (click)="close()"
+            >
+              <ion-icon slot="start" [name]="link.icon"></ion-icon>
+              <ion-label>{{ link.label }}</ion-label>
+            </ion-item>
+          }
+        </ion-list>
+      </ion-content>
+
+      <ion-footer>
+        <ion-toolbar>
+          <div class="who">
+            <ion-avatar class="avatar">
+              <ion-icon name="person"></ion-icon>
+            </ion-avatar>
+            <div class="who-text">
+              <strong>{{ adminName }}</strong>
+              <span>Administrator</span>
+            </div>
+          </div>
+        </ion-toolbar>
+        <ion-toolbar>
+          <ion-button expand="block" fill="clear" color="medium" (click)="auth.logout()">
+            <ion-icon slot="start" name="log-out-outline"></ion-icon>
+            Log out
+          </ion-button>
+        </ion-toolbar>
+      </ion-footer>
+    </ion-menu>
+
+    <ion-router-outlet id="admin-content"></ion-router-outlet>
+  </ion-split-pane>
+</ion-app>

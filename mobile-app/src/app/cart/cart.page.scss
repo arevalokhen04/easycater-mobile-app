@@ -1,0 +1,55 @@
+.pkg-card {
+  margin: 0 0 4px;
+}
+
+.section-title.inline {
+  margin: 20px 0 8px;
+  padding: 0;
+}
+
+.addons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.addon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--ec-radius-sm);
+  background: var(--ec-surface);
+  box-shadow: 0 1px 6px rgba(28, 27, 32, 0.06);
+
+  div:first-child {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  strong {
+    font-size: 0.9rem;
+    color: var(--ec-ink);
+  }
+
+  span {
+    font-size: 0.76rem;
+    color: var(--ec-muted);
+  }
+}
+
+.totals {
+  margin: 0;
+  padding: 14px 16px;
+}
+
+.action-bar {
+  position: sticky;
+  bottom: 0;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: var(--ec-surface);
+  box-shadow: 0 -2px 12px rgba(28, 27, 32, 0.08);
+}

@@ -1,0 +1,92 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start" class="ion-hide-lg">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Menu</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="createItem()">
+        <ion-icon slot="start" name="add"></ion-icon>
+        New
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <div class="admin-page" style="padding: 8px 20px 12px">
+      <ion-searchbar placeholder="Search dishes" (ionInput)="onSearch($any($event).detail.value)"></ion-searchbar>
+      <div class="chips">
+        @for (cat of categories; track cat) {
+          <button
+            type="button"
+            class="chip"
+            [class.on]="category() === cat"
+            (click)="setCategory(cat)"
+          >
+            {{ cat === 'all' ? 'All' : (cat | titlecase) }}
+          </button>
+        }
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="admin-page">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>{{ items().length }} item(s)</h2>
+      </div>
+      <div class="table-wrap">
+        @if (items().length === 0) {
+          <div class="empty-row">No dishes match your filters.</div>
+        } @else {
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Dish</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Featured</th>
+                <th>Availability</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (m of items(); track m.id) {
+                <tr>
+                  <td>
+                    <div class="cell-user">
+                      <img class="thumb" [src]="m.image" [alt]="m.name" />
+                      <div class="cell-text"><strong>{{ m.name }}</strong></div>
+                    </div>
+                  </td>
+                  <td>{{ m.category | titlecase }}</td>
+                  <td class="money">{{ money(m.price) }}</td>
+                  <td>
+                    <span class="tag" [ngClass]="m.isFeatured ? 'soon' : 'grey'">
+                      {{ m.isFeatured ? 'yes' : 'no' }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="tag" [ngClass]="m.isAvailable ? 'ok' : 'hot'">
+                      {{ m.isAvailable ? 'available' : 'sold out' }}
+                    </span>
+                  </td>
+                  <td>
+                    <ion-button fill="clear" size="small" (click)="toggleAvailable(m)">
+                      {{ m.isAvailable ? 'Mark sold out' : 'Mark available' }}
+                    </ion-button>
+                    <ion-button fill="clear" size="small" color="danger" (click)="confirmDelete(m)">
+                      <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                    </ion-button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+  </div>
+</ion-content>

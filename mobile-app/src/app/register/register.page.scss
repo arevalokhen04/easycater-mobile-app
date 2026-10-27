@@ -1,0 +1,32 @@
+.intro {
+  margin: 0 0 18px;
+  font-size: 0.92rem;
+  color: var(--ec-muted);
+}
+
+.terms {
+  --background: transparent;
+  margin: 4px 0 20px;
+
+  ion-label {
+    font-size: 0.84rem;
+    color: var(--ec-muted);
+    padding-left: 4px;
+  }
+}
+
+.alt {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: var(--ec-muted);
+
+  a {
+    color: var(--ion-color-primary);
+    font-weight: 700;
+    text-decoration: none;
+  }
+}

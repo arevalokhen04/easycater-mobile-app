@@ -1,0 +1,86 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start" class="ion-hide-lg">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Packages</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="createPackage()">
+        <ion-icon slot="start" name="add"></ion-icon>
+        New
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <div class="admin-page" style="padding: 8px 20px 12px">
+      <ion-searchbar
+        placeholder="Search packages"
+        (ionInput)="onSearch($any($event).detail.value)"
+      ></ion-searchbar>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="admin-page">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>{{ packages().length }} package(s)</h2>
+      </div>
+      <div class="table-wrap">
+        @if (packages().length === 0) {
+          <div class="empty-row">No packages match your search.</div>
+        } @else {
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Package</th>
+                <th>Category</th>
+                <th>Price / head</th>
+                <th>Guest range</th>
+                <th>Booked</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of packages(); track p.id) {
+                <tr>
+                  <td>
+                    <div class="cell-user">
+                      <img class="mini-avatar" style="object-fit: cover" [src]="p.image" [alt]="p.name" />
+                      <div class="cell-text">
+                        <strong>{{ p.name }}</strong>
+                        @if (p.isPopular) {
+                          <small>Featured</small>
+                        }
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ p.category | titlecase }}</td>
+                  <td class="money">{{ money(p.pricePerHead) }}</td>
+                  <td>{{ p.minGuests }}&ndash;{{ p.maxGuests }}</td>
+                  <td>{{ p.bookedCount }}</td>
+                  <td>
+                    <span class="tag" [ngClass]="p.isActive ? 'ok' : 'grey'">
+                      {{ p.isActive ? 'active' : 'hidden' }}
+                    </span>
+                  </td>
+                  <td>
+                    <ion-button fill="clear" size="small" (click)="toggleActive(p)">
+                      {{ p.isActive ? 'Hide' : 'Show' }}
+                    </ion-button>
+                    <ion-button fill="clear" size="small" color="danger" (click)="confirmDelete(p)">
+                      <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                    </ion-button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+  </div>
+</ion-content>

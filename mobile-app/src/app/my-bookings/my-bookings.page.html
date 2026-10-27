@@ -1,0 +1,90 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>My Bookings</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <div class="ec-chip-row">
+      @for (f of filters; track f.key) {
+        <ion-chip
+          [outline]="activeFilter() !== f.key"
+          [color]="activeFilter() === f.key ? 'primary' : 'medium'"
+          (click)="setFilter(f.key)"
+        >
+          {{ f.label }}
+        </ion-chip>
+      }
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mobile-app-wrapper">
+    @if (loading()) {
+    <div class="page-pad stack">
+      @for (i of [1, 2, 3]; track i) {
+        <ion-skeleton-text [animated]="true" style="width: 100%; height: 130px"></ion-skeleton-text>
+      }
+    </div>
+  } @else if (visible.length === 0) {
+    <div class="ec-empty">
+      <ion-icon name="calendar-clear-outline"></ion-icon>
+      <h3>No bookings here</h3>
+      <p>When you book a package it will show up on this page.</p>
+      <ion-button fill="outline" routerLink="/tabs/packages">Browse packages</ion-button>
+    </div>
+  } @else {
+    <div class="page-pad stack">
+      @for (b of visible; track b.id) {
+        <ion-card class="ec-card booking">
+          <div class="ec-media">
+            <img [src]="b.packageImage" [alt]="b.packageName" loading="lazy" />
+            <span class="ec-badge ec-icon-pill" [ngClass]="statusClass(b.status)">{{ b.status }}</span>
+          </div>
+          <div class="ec-body">
+            <h3 class="ec-title">{{ b.packageName }}</h3>
+            <p class="ref">{{ b.bookingNumber }}</p>
+
+            <div class="facts">
+              <span>
+                <ion-icon name="calendar-outline"></ion-icon>
+                {{ b.eventDate | date: 'MMM d, y' }}
+              </span>
+              <span>
+                <ion-icon name="time-outline"></ion-icon>
+                {{ b.eventTime }}
+              </span>
+              <span>
+                <ion-icon name="people-outline"></ion-icon>
+                {{ b.guestCount }}
+              </span>
+            </div>
+
+            <div class="venue">
+              <ion-icon name="location-outline"></ion-icon>
+              {{ b.venue }}
+            </div>
+
+            <div class="row-between foot">
+              <span class="ec-badge" [ngClass]="paymentClass(b.paymentStatus)">{{ b.paymentStatus }}</span>
+              <strong class="ec-price">{{ currency(b.total) }}</strong>
+            </div>
+
+            @if (b.status !== 'cancelled' && b.status !== 'completed') {
+              <ion-button
+                fill="outline"
+                color="danger"
+                size="small"
+                expand="block"
+                (click)="cancel(b)"
+              >
+                Cancel booking
+              </ion-button>
+            }
+          </div>
+        </ion-card>
+      }
+    </div>
+    }
+  </div>
+</ion-content>
