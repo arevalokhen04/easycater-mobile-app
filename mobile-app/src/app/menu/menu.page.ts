@@ -1,4 +1,5 @@
 ﻿import { Component, OnInit, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 
 import { MenuService } from '../core/services/menu.service';
@@ -20,12 +21,23 @@ export class MenuPage implements OnInit {
   constructor(
     private service: MenuService,
     public cart: CartService,
+    private router: Router,
     private toast: ToastController
   ) {}
 
   ngOnInit(): void {
     this.categories = this.service.categories();
     this.load();
+  }
+
+  /** The package being booked, when the menu is part of the booking flow. */
+  get flowPackage() {
+    return this.cart.state().package;
+  }
+
+  /** Done adding extras - continue to the order summary. */
+  reviewOrder(): void {
+    this.router.navigateByUrl('/cart');
   }
 
   label(category: MenuCategory | 'all'): string {

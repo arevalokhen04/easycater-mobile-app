@@ -36,10 +36,32 @@
       </div>
 
       <h2 class="section-title inline">Event date</h2>
-      <ion-item class="ec-field" lines="none">
-        <ion-label position="stacked">Date</ion-label>
-        <ion-input type="date" [min]="minDate" [ngModel]="eventDate()" (ngModelChange)="eventDate.set($event)" name="eventDate"></ion-input>
-      </ion-item>
+      @for (cal of [calendarKey()]; track cal) {
+        <div class="date-card">
+          <ion-datetime
+            presentation="date"
+            [min]="minDate"
+            [isDateEnabled]="isDateEnabled"
+            [value]="eventDate()"
+            (ionChange)="onDateChange($any($event).detail.value)"
+          ></ion-datetime>
+        </div>
+      }
+      <p class="ec-field-hint">
+        <ion-icon name="calendar-clear-outline"></ion-icon>
+        Struck-through dates are fully booked - one event per day.
+      </p>
+      @if (selectedDateTaken()) {
+        <p class="ec-field-hint error">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          That date is fully booked - please pick another one.
+        </p>
+      } @else if (selectedDateAvailable()) {
+        <p class="ec-field-hint ok">
+          <ion-icon name="checkmark-circle"></ion-icon>
+          {{ selectedDateLabel() }} is available - you can book this date.
+        </p>
+      }
 
       <h2 class="section-title inline">Service time</h2>
       <div class="pill-grid">
@@ -85,22 +107,40 @@
       <ion-item class="ec-field" lines="none">
         <ion-label position="stacked">Venue name</ion-label>
         <ion-input
-          placeholder="Grand Ballroom, Sapphire Hotel"
+          placeholder="Resort, hotel, covered court..."
           [ngModel]="venue()"
           (ngModelChange)="venue.set($event)"
           name="venue"
         ></ion-input>
       </ion-item>
+      @if (filteredVenues().length > 0) {
+        <p class="ec-field-hint">Suggested venues near you - tap to fill:</p>
+        <div class="sug-row">
+          @for (v of filteredVenues(); track v.name) {
+            <button type="button" class="sug-chip" (click)="applyVenueSuggestion(v)">
+              <span class="sug-name">{{ v.name }}</span>
+              <span class="sug-hint">{{ v.hint }}</span>
+            </button>
+          }
+        </div>
+      }
 
       <ion-item class="ec-field" lines="none">
-        <ion-label position="stacked">Address</ion-label>
-        <ion-input
-          placeholder="Street, city"
-          [ngModel]="address()"
-          (ngModelChange)="address.set($event)"
+        <ion-label position="stacked">Address (General Tinio, Nueva Ecija)</ion-label>
+        <ion-select
+          placeholder="Select barangay"
+          interface="action-sheet"
+          cancelText="Cancel"
+          [ngModel]="selectedBarangay()"
+          (ngModelChange)="onAddressChange($event)"
           name="address"
-        ></ion-input>
+        >
+          @for (b of barangays; track b) {
+            <ion-select-option [value]="b">Brgy. {{ b }}</ion-select-option>
+          }
+        </ion-select>
       </ion-item>
+      <p class="ec-field-hint">We only cater events inside General Tinio, Nueva Ecija.</p>
 
       <ion-item class="ec-field" lines="none">
         <ion-label position="stacked">Special requests (optional)</ion-label>
@@ -113,9 +153,27 @@
         ></ion-textarea>
       </ion-item>
 
-      <ion-button class="ec-btn block" expand="block" (click)="reviewOrder()">
-        Review Order
+      <ion-card class="ec-card ec-checklist">
+        <div class="checklist-head">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>Before you continue</span>
+        </div>
+        @for (item of checklist(); track item.key) {
+          <div class="checklist-row" [class.done]="item.done">
+            <ion-icon [name]="item.done ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
+            <span>{{ item.label }}</span>
+          </div>
+        }
+      </ion-card>
+
+      <ion-button class="ec-btn block" expand="block" [disabled]="!canProceed()" (click)="reviewOrder()">
+        Continue - add extras
       </ion-button>
+      @if (canProceed()) {
+        <p class="ec-field-hint center">Next: pick extras from the menu (optional), then review your order.</p>
+      } @else {
+        <p class="ec-field-hint center">Complete the checklist above to unlock this step.</p>
+      }
     }
   </div>
   </div>

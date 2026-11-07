@@ -31,13 +31,11 @@ export class PaymentsAdminPage implements OnInit {
   }
 
   verify(payment: AdminPayment): void {
-    this.data.updatePaymentStatus(payment.id, 'paid');
-    this.load();
+    this.data.updatePaymentStatus(payment.id, 'paid').subscribe({ next: () => this.load() });
   }
 
   refund(payment: AdminPayment): void {
-    this.data.updatePaymentStatus(payment.id, 'refunded');
-    this.load();
+    this.data.updatePaymentStatus(payment.id, 'refunded').subscribe({ next: () => this.load() });
   }
 
   statusClass(status: string): string {

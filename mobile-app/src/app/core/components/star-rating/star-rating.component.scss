@@ -1,0 +1,21 @@
+:host {
+  display: inline-flex;
+}
+
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+
+  ion-icon {
+    font-size: 14px;
+    color: var(--ion-color-warning, #f59e0b);
+  }
+
+  .value {
+    margin-left: 3px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--ion-color-warning, #f59e0b);
+  }
+}

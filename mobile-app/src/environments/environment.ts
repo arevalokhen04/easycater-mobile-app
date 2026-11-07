@@ -9,9 +9,9 @@ export const environment = {
   apiUrl: 'http://localhost:4000/api/v1',
 
   /**
-   * Services currently serve fixtures from `core/data/mock-data.ts` so the app
-   * runs without the backend. Set this to false and restart the API to switch
-   * the services over to HTTP.
+   * false = every service talks to the backend API (start it with
+   * `npm run dev` in EasyCater/backend-api). true = fixtures only, no backend.
+   * Unit tests force this back to true - see booking.service.spec.ts.
    */
-  useMockData: true,
+  useMockData: false,
 };

@@ -34,15 +34,13 @@
           <div class="ec-media">
             <img [src]="pkg.image" [alt]="pkg.name" loading="lazy" />
             @if (pkg.isPopular) {
-              <span class="ec-badge hot ec-icon-pill">Popular</span>
+              <span class="ec-badge brand ec-icon-pill">Popular</span>
             }
           </div>
           <div class="ec-body">
             <div class="row-between">
               <h3 class="ec-title">{{ pkg.name }}</h3>
-              <span class="rating">
-                <ion-icon name="star"></ion-icon>{{ pkg.rating }}
-              </span>
+              <app-star-rating [rating]="pkg.rating" />
             </div>
             <p class="ec-sub">{{ pkg.description }}</p>
             <div class="row-between meta">

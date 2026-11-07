@@ -1,10 +1,13 @@
 .ec-chip-row {
-  padding: 4px 0 10px;
-}
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
 
-ion-chip {
-  --border-radius: 999px;
-  font-weight: 600;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .booking .ec-body {
@@ -56,4 +59,20 @@ ion-chip {
   margin-top: 2px;
   padding-top: 10px;
   border-top: 1px solid #f0f0f4;
+
+  &.balance {
+    margin-top: -4px;
+    padding-top: 6px;
+    border-top: none;
+
+    span {
+      font-size: 0.78rem;
+      color: var(--ec-muted);
+    }
+
+    strong {
+      font-size: 0.86rem;
+      color: var(--ec-ink);
+    }
+  }
 }

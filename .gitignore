@@ -22,3 +22,6 @@ backend-api/uploads/*
 Thumbs.db
 .vscode/
 .idea/
+
+# ZCode tool-local state
+.zcode/

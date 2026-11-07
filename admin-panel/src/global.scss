@@ -15,7 +15,11 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-@import "@ionic/angular/css/palettes/dark.system.css";
+// No dark palette: EasyCater is a light-only brand (orange & white).
+// Lock the color scheme so the OS dark mode can never flip the screens black.
+:root {
+  color-scheme: light;
+}
 
 /* ------------------------------------------------------------- Layout -- */
 

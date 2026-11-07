@@ -17,7 +17,8 @@ const sales = asyncHandler(async (req, res) => {
     Booking.aggregate([
       { $match: { createdAt: { $gte: from, $lte: to }, status: { $ne: 'cancelled' } } },
       { $group: { _id: '$package', count: { $sum: 1 }, revenue: { $sum: '$total' } } },
-      { $populate: { path: '_id', model: 'Package', select: 'name category' } },
+      { $lookup: { from: 'packages', localField: '_id', foreignField: '_id', as: 'package' } },
+      { $unwind: '$package' },
       { $sort: { revenue: -1 } },
     ]),
     Payment.aggregate([
@@ -41,7 +42,8 @@ const sales = asyncHandler(async (req, res) => {
       payments: totals[0]?.payments || 0,
       byMethod: (totals[0]?.byMethod || []).reduce((acc, m) => ({ ...acc, [m]: (acc[m] || 0) + 1 }), {}),
       byPackage: byPackage.map((r) => ({
-        package: r._id,
+        name: r.package.name,
+        category: r.package.category,
         bookings: r.count,
         revenue: r.revenue,
       })),

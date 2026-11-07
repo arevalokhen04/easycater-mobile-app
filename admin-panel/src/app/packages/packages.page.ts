@@ -67,9 +67,13 @@ export class PackagesAdminPage implements OnInit {
   }
 
   toggleActive(pkg: AdminPackage): void {
-    this.data.togglePackageActive(pkg.id);
-    this.load();
-    this.notify(`${pkg.name} is now ${pkg.isActive ? 'hidden' : 'visible'}`);
+    this.data.togglePackageActive(pkg.id).subscribe({
+      next: () => {
+        this.load();
+        this.notify(`${pkg.name} is now ${pkg.isActive ? 'hidden' : 'visible'}`);
+      },
+      error: (err: Error) => this.notify(err.message),
+    });
   }
 
   async confirmDelete(pkg: AdminPackage): Promise<void> {
@@ -82,9 +86,13 @@ export class PackagesAdminPage implements OnInit {
           text: 'Delete',
           role: 'destructive',
           handler: () => {
-            this.data.deletePackage(pkg.id);
-            this.load();
-            this.notify('Package deleted');
+            this.data.deletePackage(pkg.id).subscribe({
+              next: () => {
+                this.load();
+                this.notify('Package deleted');
+              },
+              error: (err: Error) => this.notify(err.message),
+            });
           },
         },
       ],

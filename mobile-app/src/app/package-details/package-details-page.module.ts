@@ -6,9 +6,10 @@ import { RouterModule } from '@angular/router';
 
 import { PackageDetailsPage } from './package-details.page';
 import { PackageDetailsPageRoutingModule } from './package-details-page-routing.module';
+import { SharedComponentsModule } from '../core/components/shared-components.module';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, IonicModule, RouterModule, PackageDetailsPageRoutingModule],
+  imports: [CommonModule, FormsModule, IonicModule, RouterModule, PackageDetailsPageRoutingModule, SharedComponentsModule],
   declarations: [PackageDetailsPage],
 })
 export class PackageDetailsPageModule {}

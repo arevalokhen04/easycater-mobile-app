@@ -58,7 +58,11 @@
             <ion-label>
               <h3>Date & time</h3>
               <p>
-                {{ cart.state().eventDate | date: 'MMM d, y' }} &middot; {{ cart.state().eventTime }}
+                @if (cart.state().eventDate) {
+                  {{ cart.state().eventDate | date: 'MMM d, y' }} &middot; {{ cart.state().eventTime }}
+                } @else {
+                  To be confirmed &middot; {{ cart.state().eventTime }}
+                }
               </p>
             </ion-label>
           </ion-item>
@@ -105,8 +109,13 @@
       </div>
 
       <div class="action-bar">
-        <ion-button class="ec-btn block" expand="block" (click)="proceed()">
-          Proceed to Payment
+        <p class="ec-note">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          Your booking is created now and stays "pending". Once you pay - even just the
+          downpayment - it becomes fixed: no more changes and no cancellation.
+        </p>
+        <ion-button class="ec-btn block" expand="block" [disabled]="creating()" (click)="proceed()">
+          {{ creating() ? 'Creating booking...' : 'Proceed to Payment' }}
         </ion-button>
       </div>
     }

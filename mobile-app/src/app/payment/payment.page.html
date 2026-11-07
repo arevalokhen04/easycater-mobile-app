@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/cart" text=""></ion-back-button>
+      <ion-back-button [defaultHref]="backHref" text=""></ion-back-button>
     </ion-buttons>
     <ion-title>Payment</ion-title>
   </ion-toolbar>
@@ -9,15 +9,18 @@
 
 <ion-content [fullscreen]="true">
   <div class="mobile-app-wrapper">
-    @if (cart.hasItems()) {
+    @if (booking; as b) {
     <div class="ec-form-wrap">
       <div class="amount-card">
-        <span>Amount to pay</span>
+        <span>{{ payingBalance ? 'Remaining balance' : 'Amount to pay' }}</span>
         <strong>{{ currency(amount()) }}</strong>
-        <small>Order total {{ currency(cart.totals().total) }}</small>
+        <small>Booking total {{ currency(b.total) }}</small>
+        @if (payingBalance) {
+          <small>Already paid {{ currency(alreadyPaid) }}</small>
+        }
       </div>
 
-      <h2 class="section-title inline">Payment option</h2>
+      <h2 class="section-title inline">Payment method</h2>
       <div class="method-list">
         @for (m of methods; track m.id) {
           <button
@@ -39,42 +42,49 @@
         }
       </div>
 
-      <h2 class="section-title inline">How much?</h2>
-      <div class="option-row">
-        <button
-          type="button"
-          class="pill"
-          [class.on]="payInFull()"
-          (click)="setPayInFull(true)"
-        >
-          Full amount
-        </button>
-        <button
-          type="button"
-          class="pill"
-          [class.on]="!payInFull()"
-          (click)="setPayInFull(false)"
-        >
-          50% downpayment
-        </button>
-      </div>
-
-      @if (!payInFull()) {
-        <ion-item class="ec-field" lines="none">
-          <ion-label position="stacked">Amount (max {{ currency(cart.totals().total) }})</ion-label>
-          <ion-input
-            type="number"
-            inputmode="numeric"
-            [ngModel]="amount()"
-            (ngModelChange)="amount.set(+$event)"
-            name="amount"
-          ></ion-input>
-        </ion-item>
+      @if (!payingBalance) {
+        <h2 class="section-title inline">How much?</h2>
+        <div class="option-row">
+          <button
+            type="button"
+            class="pill"
+            [class.on]="payInFull()"
+            (click)="setPayInFull(true)"
+          >
+            Full amount
+          </button>
+          <button
+            type="button"
+            class="pill"
+            [class.on]="!payInFull()"
+            (click)="setPayInFull(false)"
+          >
+            50% downpayment
+          </button>
+        </div>
+        <p class="ec-field-hint">
+          @if (payInFull()) {
+            You'll pay the full booking total - {{ currency(amount()) }}.
+          } @else {
+            The downpayment is fixed at 50% - {{ currency(amount()) }} of {{ currency(b.total) }}.
+          }
+        </p>
+      } @else {
+        <p class="ec-field-hint">
+          The balance is fixed at the exact remaining amount - {{ currency(amount()) }}.
+        </p>
       }
 
-      <div class="secure">
+      <div class="secure warn">
         <ion-icon name="lock-closed-outline"></ion-icon>
-        <span>Payments are processed securely. You will receive a receipt after checkout.</span>
+        <span>
+          Once this payment goes through, the booking is
+          <strong>fixed and locked</strong> - no more changes, no cancellation.
+        </span>
+      </div>
+      <div class="secure">
+        <ion-icon name="card-outline"></ion-icon>
+        <span>Payments are processed securely. You will get a receipt after checkout.</span>
       </div>
     </div>
 

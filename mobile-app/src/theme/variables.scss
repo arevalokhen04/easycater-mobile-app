@@ -12,19 +12,19 @@
   --ion-color-primary-shade: #d5680c;
   --ion-color-primary-tint: #f38425;
 
-  --ion-color-secondary: #0f766e;
-  --ion-color-secondary-rgb: 15, 118, 110;
+  --ion-color-secondary: #ff9d47;
+  --ion-color-secondary-rgb: 255, 157, 71;
   --ion-color-secondary-contrast: #ffffff;
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #0d6862;
-  --ion-color-secondary-tint: #27847d;
+  --ion-color-secondary-shade: #e08a3e;
+  --ion-color-secondary-tint: #ffa75a;
 
-  --ion-color-tertiary: #7c3aed;
-  --ion-color-tertiary-rgb: 124, 58, 237;
+  --ion-color-tertiary: #c85f05;
+  --ion-color-tertiary-rgb: 200, 95, 5;
   --ion-color-tertiary-contrast: #ffffff;
   --ion-color-tertiary-contrast-rgb: 255, 255, 255;
-  --ion-color-tertiary-shade: #6d33d1;
-  --ion-color-tertiary-tint: #894ee9;
+  --ion-color-tertiary-shade: #b05404;
+  --ion-color-tertiary-tint: #ce6f1e;
 
   --ion-color-success: #16a34a;
   --ion-color-success-rgb: 22, 163, 74;
@@ -64,9 +64,10 @@
   // Custom brand tokens used by global.scss helpers
   --ec-brand: #f2760d;
   --ec-ink: #1c1b20;
-  --ec-muted: #6b7280;
+  --ec-muted: #7a7a7a;
   --ec-surface: #ffffff;
-  --ec-page-bg: #f8f8fa;
+  --ec-page-bg: #ffffff;
   --ec-radius: 16px;
   --ec-radius-sm: 10px;
 }
+

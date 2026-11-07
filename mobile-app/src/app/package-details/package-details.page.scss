@@ -14,19 +14,6 @@
   }
 }
 
-.rating {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--ion-color-warning);
-
-  ion-icon {
-    font-size: 15px;
-  }
-}
-
 .ec-price.big {
   margin: 12px 0 18px;
   font-size: 1.5rem;

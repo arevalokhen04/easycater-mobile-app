@@ -4,19 +4,17 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { RouteReuseStrategy } from '@angular/router';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular/lazy';
-import { provideIonicAngular } from '@ionic/angular/provide';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { tokenInterceptor } from './core/interceptors/token.interceptor';
+import { TokenInterceptor } from './core/interceptors/token.interceptor';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, HttpClientModule, IonicModule, AppRoutingModule],
+  imports: [BrowserModule, HttpClientModule, IonicModule.forRoot({ mode: 'md' }), AppRoutingModule],
   providers: [
-    provideIonicAngular({ mode: 'md' }),
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    { provide: HTTP_INTERCEPTORS, useValue: tokenInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
 })

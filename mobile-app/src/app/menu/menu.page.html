@@ -20,31 +20,42 @@
       (ionInput)="onSearch($any($event).detail.value)"
     ></ion-searchbar>
   </ion-toolbar>
-
-  <ion-toolbar>
-    <div class="ec-chip-row">
-      <ion-chip [outline]="activeCategory() !== 'all'" color="primary" (click)="selectCategory('all')">
-        All
-      </ion-chip>
-      @for (cat of categories; track cat) {
-        <ion-chip
-          [outline]="activeCategory() !== cat"
-          [color]="activeCategory() === cat ? 'primary' : 'medium'"
-          (click)="selectCategory(cat)"
-        >
-          {{ label(cat) }}
-        </ion-chip>
-      }
-    </div>
-  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <div class="mobile-app-wrapper">
+    <div class="ec-chip-row">
+      <button
+        type="button"
+        class="pill"
+        [class.on]="activeCategory() === 'all'"
+        (click)="selectCategory('all')"
+      >
+        All
+      </button>
+      @for (cat of categories; track cat) {
+        <button
+          type="button"
+          class="pill"
+          [class.on]="activeCategory() === cat"
+          (click)="selectCategory(cat)"
+        >
+          {{ label(cat) }}
+        </button>
+      }
+    </div>
     @if (!cart.hasItems()) {
     <div class="hint">
       <ion-icon name="information-circle-outline"></ion-icon>
       <span>Choose a package first &mdash; extras you add here will attach to it.</span>
+    </div>
+  } @else {
+    <div class="hint flow">
+      <ion-icon name="restaurant-outline"></ion-icon>
+      <span>
+        Adding extras for <strong>{{ flowPackage?.name }}</strong> ({{ cart.state().guestCount }} guests)
+        &mdash; optional. Tap <strong>Review Order</strong> when done.
+      </span>
     </div>
   }
 
@@ -80,4 +91,12 @@
     </div>
   }
   </div>
+
+  @if (cart.hasItems()) {
+    <div class="action-bar">
+      <ion-button class="ec-btn block" expand="block" (click)="reviewOrder()">
+        Review Order{{ cart.addOnCount() > 0 ? ' (' + cart.addOnCount() + ' add-on' + (cart.addOnCount() > 1 ? 's' : '') + ')' : '' }}
+      </ion-button>
+    </div>
+  }
 </ion-content>

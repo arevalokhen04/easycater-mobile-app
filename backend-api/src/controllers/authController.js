@@ -12,6 +12,7 @@ const publicUser = (user) => ({
   role: user.role,
   avatar: user.avatar,
   address: user.address,
+  isActive: user.isActive,
   createdAt: user.createdAt,
 });
 
@@ -56,6 +57,22 @@ const me = asyncHandler(async (req, res) => {
   res.json({ success: true, data: publicUser(req.user) });
 });
 
+/** PUT /api/v1/auth/profile - customer-editable fields only */
+const updateProfile = asyncHandler(async (req, res) => {
+  const allowed = ['name', 'phone', 'address', 'avatar'];
+  const payload = {};
+  allowed.forEach((key) => {
+    if (req.body[key] !== undefined) payload[key] = req.body[key];
+  });
+
+  const user = await User.findByIdAndUpdate(req.user._id, { $set: payload }, {
+    new: true,
+    runValidators: true,
+  });
+  if (!user) throw ApiError.notFound('User not found');
+  res.json({ success: true, data: publicUser(user) });
+});
+
 /** PUT /api/v1/auth/password */
 const changePassword = asyncHandler(async (req, res) => {
   const { currentPassword, newPassword } = req.body;
@@ -71,4 +88,4 @@ const changePassword = asyncHandler(async (req, res) => {
   res.json({ success: true, message: 'Password updated' });
 });
 
-module.exports = { register, login, me, changePassword, publicUser };
+module.exports = { register, login, me, updateProfile, changePassword, publicUser };

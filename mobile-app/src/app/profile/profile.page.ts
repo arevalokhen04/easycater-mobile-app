@@ -1,6 +1,6 @@
 ﻿import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 
 import { AuthService } from '../core/services/auth.service';
 import { NotificationService } from '../core/services/notification.service';
@@ -24,6 +24,7 @@ export class ProfilePage implements OnInit {
     public notificationService: NotificationService,
     private bookings: BookingService,
     private alert: AlertController,
+    private toast: ToastController,
     private router: Router
   ) {}
 
@@ -38,6 +39,7 @@ export class ProfilePage implements OnInit {
           .reduce((sum, b) => sum + b.total, 0),
       });
     });
+    this.notificationService.load().subscribe({ error: () => undefined });
   }
 
   get user() {
@@ -87,12 +89,16 @@ export class ProfilePage implements OnInit {
 
   saveEdit(): void {
     if (!this.editName().trim()) return;
-    this.auth.updateProfile({
-      name: this.editName().trim(),
-      phone: this.editPhone().trim(),
-      address: this.editAddress().trim(),
-    });
-    this.editing.set(false);
+    this.auth
+      .updateProfile({
+        name: this.editName().trim(),
+        phone: this.editPhone().trim(),
+        address: this.editAddress().trim(),
+      })
+      .subscribe({
+        next: () => this.editing.set(false),
+        error: (err: Error) => this.notify(err?.message || 'Could not save your profile'),
+      });
   }
 
   async logout(): Promise<void> {
@@ -109,6 +115,11 @@ export class ProfilePage implements OnInit {
 
   goToBookings(): void {
     this.router.navigateByUrl('/tabs/bookings');
+  }
+
+  private async notify(message: string): Promise<void> {
+    const toast = await this.toast.create({ message, duration: 2200, position: 'bottom' });
+    await toast.present();
   }
 }
 

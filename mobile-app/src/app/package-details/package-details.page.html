@@ -24,9 +24,7 @@
     <div class="detail">
       <div class="row-between">
         <h1>{{ pkg.name }}</h1>
-        <span class="rating">
-          <ion-icon name="star"></ion-icon>{{ pkg.rating }}
-        </span>
+        <app-star-rating [rating]="pkg.rating" />
       </div>
 
       <p class="ec-sub">{{ pkg.description }}</p>
@@ -63,7 +61,7 @@
       <ion-list class="ec-plain">
         @for (item of pkg.inclusions; track item) {
           <ion-item lines="none">
-            <ion-icon name="checkmark-circle" color="success" slot="start"></ion-icon>
+            <ion-icon name="checkmark-circle" slot="start"></ion-icon>
             <ion-label>{{ item }}</ion-label>
           </ion-item>
         }
@@ -98,3 +96,4 @@
   }
   </div>
 </ion-content>
+

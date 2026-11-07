@@ -37,30 +37,6 @@
   gap: 8px;
 }
 
-.pill {
-  padding: 8px 16px;
-  border: 1px solid #dcdce3;
-  border-radius: 999px;
-  background: var(--ec-surface);
-  color: var(--ec-ink);
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-
-  &:focus-visible {
-    outline: 2px solid var(--ion-color-primary);
-    outline-offset: 2px;
-  }
-
-  &.on {
-    background: var(--ion-color-primary);
-    border-color: var(--ion-color-primary);
-    color: #fff;
-  }
-}
-
 .guest-box {
   display: flex;
   align-items: center;
@@ -87,4 +63,90 @@
 .stepper {
   display: flex;
   gap: 8px;
+}
+
+/* ---- Venue suggestion chips (recognition over recall) ---- */
+.sug-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.sug-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 7px 12px;
+  border: 1px solid var(--ec-brand-line, rgba(242, 118, 13, 0.3));
+  border-radius: var(--ec-radius-sm);
+  background: var(--ec-brand-soft, rgba(242, 118, 13, 0.06));
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:active {
+    border-color: var(--ion-color-primary);
+    background: rgba(242, 118, 13, 0.14);
+  }
+
+  .sug-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ec-ink);
+  }
+
+  .sug-hint {
+    font-size: 0.68rem;
+    color: var(--ec-muted);
+  }
+}
+
+/* Address dropdown reads like the other fields */
+.ec-field ion-select {
+  width: 100%;
+  font-size: 0.95rem;
+  color: var(--ec-ink);
+}
+
+/* Taken-date hints (error prevention + plain-language errors) */
+.ec-field-hint {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  &.warn {
+    color: #b26a00;
+  }
+
+  &.error {
+    color: #c0392b;
+    font-weight: 600;
+  }
+
+  &.ok {
+    color: #1f7a3f;
+    font-weight: 600;
+  }
+
+  ion-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+}
+
+/* Availability calendar - struck-through dates are fully booked */
+.date-card {
+  margin: 0 2px;
+  border: 1px solid var(--ec-brand-line, rgba(242, 118, 13, 0.3));
+  border-radius: var(--ec-radius-sm);
+  background: var(--ec-surface);
+  overflow: hidden;
+
+  ion-datetime {
+    width: 100%;
+    --background: transparent;
+  }
 }

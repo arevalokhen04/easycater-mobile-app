@@ -42,9 +42,13 @@ export class CustomersAdminPage implements OnInit {
   }
 
   toggleActive(c: AdminUser): void {
-    this.data.toggleCustomerActive(c.id);
-    this.load();
-    this.notify(`${c.name} is now ${c.isActive ? 'disabled' : 'enabled'}`);
+    this.data.toggleCustomerActive(c.id).subscribe({
+      next: () => {
+        this.load();
+        this.notify(`${c.name} is now ${c.isActive ? 'disabled' : 'enabled'}`);
+      },
+      error: (err: Error) => this.notify(err.message),
+    });
   }
 
   async confirmDelete(c: AdminUser): Promise<void> {
@@ -57,9 +61,13 @@ export class CustomersAdminPage implements OnInit {
           text: 'Delete',
           role: 'destructive',
           handler: () => {
-            this.data.deleteCustomer(c.id);
-            this.load();
-            this.notify('Customer deleted');
+            this.data.deleteCustomer(c.id).subscribe({
+              next: () => {
+                this.load();
+                this.notify('Customer deleted');
+              },
+              error: (err: Error) => this.notify(err.message),
+            });
           },
         },
       ],

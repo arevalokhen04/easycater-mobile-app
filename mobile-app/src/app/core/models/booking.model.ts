@@ -35,5 +35,7 @@ export interface Booking {
   total: number;
   status: BookingStatus;
   paymentStatus: PaymentStatus;
+  /** Running sum of confirmed payments - mirrors the backend aggregation. */
+  amountPaid?: number;
   createdAt?: string;
 }

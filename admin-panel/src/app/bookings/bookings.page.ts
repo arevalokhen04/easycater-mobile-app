@@ -47,8 +47,7 @@ export class BookingsAdminPage implements OnInit {
   }
 
   updateStatus(booking: AdminBooking, status: string): void {
-    this.data.updateBookingStatus(booking.id, status);
-    this.load();
+    this.data.updateBookingStatus(booking.id, status).subscribe({ next: () => this.load() });
   }
 
   statusClass(status: string): string {

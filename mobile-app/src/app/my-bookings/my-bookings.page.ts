@@ -1,7 +1,9 @@
-﻿import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { AlertController, ToastController } from '@ionic/angular';
 
-import { BookingService } from '../core/services/booking.service';
+import { BookingService, CancelCheck } from '../core/services/booking.service';
+import { CartService } from '../core/services/cart.service';
 import { Booking, BookingStatus } from '../core/models/booking.model';
 
 type Filter = 'all' | 'upcoming' | 'completed' | 'cancelled';
@@ -26,6 +28,8 @@ export class MyBookingsPage implements OnInit {
 
   constructor(
     private service: BookingService,
+    private cart: CartService,
+    private router: Router,
     private alert: AlertController,
     private toast: ToastController
   ) {}
@@ -70,6 +74,8 @@ export class MyBookingsPage implements OnInit {
         return 'wait';
       case 'confirmed':
         return 'info';
+      case 'in-progress':
+        return 'brand';
       default:
         return 'soon';
     }
@@ -77,6 +83,21 @@ export class MyBookingsPage implements OnInit {
 
   paymentClass(paid: string): string {
     return paid === 'paid' ? 'ok' : paid === 'partial' ? 'wait' : '';
+  }
+
+  /** Cancellation rules for the card UI (locked, cut-off or free to cancel). */
+  cancelCheck(b: Booking): CancelCheck {
+    return this.service.canCancel(b);
+  }
+
+  remaining(b: Booking): number {
+    return this.service.remainingBalance(b);
+  }
+
+  /** Unpaid pending bookings can go straight back to the payment screen. */
+  payNow(b: Booking): void {
+    this.cart.setActiveBooking(b);
+    this.router.navigateByUrl('/payment');
   }
 
   async cancel(booking: Booking): Promise<void> {
@@ -89,9 +110,12 @@ export class MyBookingsPage implements OnInit {
           text: 'Cancel booking',
           role: 'destructive',
           handler: () => {
-            this.service.cancel(booking.id).subscribe(() => {
-              this.load();
-              this.notify('Booking cancelled');
+            this.service.cancel(booking.id).subscribe({
+              next: () => {
+                this.load();
+                this.notify('Booking cancelled');
+              },
+              error: (err: Error) => this.notify(err?.message || 'This booking can no longer be cancelled'),
             });
           },
         },
@@ -113,6 +137,3 @@ export class MyBookingsPage implements OnInit {
     await t.present();
   }
 }
-
-
-

@@ -8,7 +8,7 @@ import { provideIonicAngular } from '@ionic/angular/provide';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { tokenInterceptor } from './core/interceptors/token.interceptor';
+import { TokenInterceptor } from './core/interceptors/token.interceptor';
 
 // AdminShellPage is declared by its own lazily-loaded module
 // (AdminShellPageModule), so it must not be declared here.
@@ -18,7 +18,7 @@ import { tokenInterceptor } from './core/interceptors/token.interceptor';
   providers: [
     provideIonicAngular({ mode: 'md' }),
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    { provide: HTTP_INTERCEPTORS, useValue: tokenInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
 })

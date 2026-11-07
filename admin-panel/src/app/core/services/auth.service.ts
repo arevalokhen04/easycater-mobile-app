@@ -1,7 +1,10 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { delay, map } from 'rxjs/operators';
+
+import { environment } from '../../../environments/environment';
+import { ApiService } from './api.service';
 
 const TOKEN_KEY = 'easycater.admin.token';
 const USER_KEY = 'easycater.admin.user';
@@ -20,13 +23,27 @@ const DEMO_ADMIN: AdminAccount = {
   role: 'admin',
 };
 
+interface AuthApiUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+interface AuthApiResponse {
+  user: AuthApiUser;
+  token: string;
+}
+
 /**
- * Mock admin auth. Swap the `of(...)` bodies for
- * `this.api.post<AuthResponse>('/auth/login', ...)` when wiring the backend.
+ * Admin authentication. Mock mode accepts any valid email (fixtures only);
+ * API mode signs in against the backend and requires the admin role.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private router = inject(Router);
+  private api = inject(ApiService);
+
   private currentUser = signal<AdminAccount | null>(this.restore());
 
   readonly user = this.currentUser.asReadonly();
@@ -41,15 +58,28 @@ export class AuthService {
       return throwError(() => new Error('Enter a valid email address'));
     }
 
-    const account: AdminAccount = { ...DEMO_ADMIN, email: email.trim() };
-    const token = `mock-admin-token-${Date.now()}`;
+    if (environment.useMockData) {
+      const account: AdminAccount = { ...DEMO_ADMIN, email: email.trim() };
+      const token = `mock-admin-token-${Date.now()}`;
+      this.persist(account, token);
+      return of({ user: account, token }).pipe(delay(400));
+    }
 
-    localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem(USER_KEY, JSON.stringify(account));
-    this.token.set(token);
-    this.currentUser.set(account);
-
-    return of({ user: account, token }).pipe(delay(400));
+    return this.api.post<AuthApiResponse>('/auth/login', { email, password }).pipe(
+      map((res) => {
+        if (res.user.role !== 'admin') {
+          throw new Error('This account is not an admin');
+        }
+        const account: AdminAccount = {
+          id: res.user.id,
+          name: res.user.name,
+          email: res.user.email,
+          role: 'admin',
+        };
+        this.persist(account, res.token);
+        return { user: account, token: res.token };
+      })
+    );
   }
 
   logout(): void {
@@ -58,6 +88,13 @@ export class AuthService {
     this.token.set(null);
     this.currentUser.set(null);
     this.router.navigateByUrl('/login', { replaceUrl: true });
+  }
+
+  private persist(account: AdminAccount, token: string): void {
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(account));
+    this.token.set(token);
+    this.currentUser.set(account);
   }
 
   private restore(): AdminAccount | null {

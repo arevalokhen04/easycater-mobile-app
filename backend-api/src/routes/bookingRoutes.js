@@ -8,6 +8,7 @@ const router = express.Router();
 router.use(authenticate);
 
 router.get('/', ctrl.list);
+router.get('/taken-dates', ctrl.takenDates);
 router.get('/:id', ctrl.getOne);
 router.post('/', ctrl.create);
 router.post('/quote', ctrl.quote);

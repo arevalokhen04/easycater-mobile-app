@@ -78,9 +78,13 @@ export class MenuAdminPage implements OnInit {
   }
 
   toggleAvailable(item: AdminMenuItem): void {
-    this.data.toggleMenuItem(item.id);
-    this.load();
-    this.notify(`${item.name} is now ${item.isAvailable ? 'unavailable' : 'available'}`);
+    this.data.toggleMenuItem(item.id).subscribe({
+      next: () => {
+        this.load();
+        this.notify(`${item.name} is now ${item.isAvailable ? 'unavailable' : 'available'}`);
+      },
+      error: (err: Error) => this.notify(err.message),
+    });
   }
 
   async confirmDelete(item: AdminMenuItem): Promise<void> {
@@ -93,9 +97,13 @@ export class MenuAdminPage implements OnInit {
           text: 'Delete',
           role: 'destructive',
           handler: () => {
-            this.data.deleteMenuItem(item.id);
-            this.load();
-            this.notify('Menu item deleted');
+            this.data.deleteMenuItem(item.id).subscribe({
+              next: () => {
+                this.load();
+                this.notify('Menu item deleted');
+              },
+              error: (err: Error) => this.notify(err.message),
+            });
           },
         },
       ],

@@ -2,24 +2,22 @@
   <ion-toolbar>
     <ion-title>My Bookings</ion-title>
   </ion-toolbar>
-
-  <ion-toolbar>
-    <div class="ec-chip-row">
-      @for (f of filters; track f.key) {
-        <ion-chip
-          [outline]="activeFilter() !== f.key"
-          [color]="activeFilter() === f.key ? 'primary' : 'medium'"
-          (click)="setFilter(f.key)"
-        >
-          {{ f.label }}
-        </ion-chip>
-      }
-    </div>
-  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <div class="mobile-app-wrapper">
+    <div class="ec-chip-row">
+      @for (f of filters; track f.key) {
+        <button
+          type="button"
+          class="pill"
+          [class.on]="activeFilter() === f.key"
+          (click)="setFilter(f.key)"
+        >
+          {{ f.label }}
+        </button>
+      }
+    </div>
     @if (loading()) {
     <div class="page-pad stack">
       @for (i of [1, 2, 3]; track i) {
@@ -70,16 +68,39 @@
               <strong class="ec-price">{{ currency(b.total) }}</strong>
             </div>
 
+            @if (b.paymentStatus === 'partial') {
+              <div class="row-between foot balance">
+                <span>Remaining balance</span>
+                <strong>{{ currency(remaining(b)) }}</strong>
+              </div>
+            }
+
             @if (b.status !== 'cancelled' && b.status !== 'completed') {
-              <ion-button
-                fill="outline"
-                color="danger"
-                size="small"
-                expand="block"
-                (click)="cancel(b)"
-              >
-                Cancel booking
-              </ion-button>
+              @if (!cancelCheck(b).allowed) {
+                <div class="ec-note">
+                  <ion-icon name="lock-closed-outline"></ion-icon>
+                  <span>{{ cancelCheck(b).reason }}</span>
+                </div>
+              } @else {
+                <ion-button
+                  fill="outline"
+                  color="danger"
+                  size="small"
+                  expand="block"
+                  (click)="cancel(b)"
+                >
+                  Cancel booking
+                </ion-button>
+              }
+              @if (b.paymentStatus === 'unpaid') {
+                <ion-button class="ec-btn" size="small" expand="block" (click)="payNow(b)">
+                  Pay now
+                </ion-button>
+              } @else if (b.paymentStatus === 'partial') {
+                <ion-button class="ec-btn" size="small" expand="block" (click)="payNow(b)">
+                  Pay {{ currency(remaining(b)) }} balance
+                </ion-button>
+              }
             }
           </div>
         </ion-card>

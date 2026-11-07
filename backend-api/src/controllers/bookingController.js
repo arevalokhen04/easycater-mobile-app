@@ -9,6 +9,10 @@ const asyncHandler = require('../utils/asyncHandler');
 const SERVICE_RATE = 0.10; // 10%
 const TAX_RATE = 0.12; // 12%
 
+// Booking rules - kept in sync with mobile-app/src/app/core/services/booking.service.ts
+const LEAD_DAYS = 7; // events must be booked at least this many days ahead
+const CANCEL_CUTOFF_HOURS = 2; // cancellations close this many hours before the event
+
 function computeTotals(pkg, guestCount, addOns = []) {
   const subtotal = pkg.pricePerHead * guestCount + addOns.reduce((sum, a) => sum + a.price * a.quantity, 0);
   const serviceCharge = Math.round(subtotal * SERVICE_RATE * 100) / 100;
@@ -16,6 +20,38 @@ function computeTotals(pkg, guestCount, addOns = []) {
   const total = Math.round((subtotal + serviceCharge + tax) * 100) / 100;
   return { subtotal, serviceCharge, tax, total };
 }
+
+/** Earliest bookable event date (today + LEAD_DAYS), local-timezone safe. */
+function earliestEventDate() {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + LEAD_DAYS);
+  return d;
+}
+
+/** Event start as a Date from "YYYY-MM-DD" + "h:mm AM/PM". */
+function eventStart(eventDate, eventTime) {
+  const base = new Date(eventDate);
+  const match = /(\d{1,2}):(\d{2})\s*(AM|PM)/i.exec(String(eventTime || ''));
+  if (match) {
+    let hours = Number(match[1]) % 12;
+    if (match[3].toUpperCase() === 'PM') hours += 12;
+    base.setHours(hours, Number(match[2]), 0, 0);
+  } else {
+    base.setHours(0, 0, 0, 0);
+  }
+  return base;
+}
+
+/** GET /api/v1/bookings/taken-dates - dates that already hold an active booking */
+const takenDates = asyncHandler(async (_req, res) => {
+  const rows = await Booking.aggregate([
+    { $match: { status: { $ne: 'cancelled' } } },
+    { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$eventDate' } } } },
+    { $sort: { _id: 1 } },
+  ]);
+  res.json({ success: true, data: rows.map((r) => r._id) });
+});
 
 /** GET /api/v1/bookings */
 const list = asyncHandler(async (req, res) => {
@@ -45,12 +81,23 @@ const list = asyncHandler(async (req, res) => {
     Booking.countDocuments(filter),
   ]);
 
+  const paidSums = await paidTotals(items.map((b) => b._id));
   res.json({
     success: true,
-    data: items,
+    data: items.map((b) => ({ ...b.toObject(), amountPaid: paidSums.get(String(b._id)) || 0 })),
     meta: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) },
   });
 });
+
+/** Sum of confirmed payments per booking id. */
+const paidTotals = async (bookingIds) => {
+  if (!bookingIds.length) return new Map();
+  const rows = await Payment.aggregate([
+    { $match: { booking: { $in: bookingIds }, status: 'paid' } },
+    { $group: { _id: '$booking', sum: { $sum: '$amount' } } },
+  ]);
+  return new Map(rows.map((r) => [String(r._id), r.sum]));
+};
 
 /** GET /api/v1/bookings/:id */
 const getOne = asyncHandler(async (req, res) => {
@@ -65,7 +112,10 @@ const getOne = asyncHandler(async (req, res) => {
   }
 
   const payments = await Payment.find({ booking: booking._id }).sort({ createdAt: -1 });
-  res.json({ success: true, data: { ...booking.toObject(), payments } });
+  const amountPaid = payments
+    .filter((p) => p.status === 'paid')
+    .reduce((sum, p) => sum + p.amount, 0);
+  res.json({ success: true, data: { ...booking.toObject(), payments, amountPaid } });
 });
 
 /** POST /api/v1/bookings */
@@ -76,6 +126,38 @@ const create = asyncHandler(async (req, res) => {
   const pkg = await Package.findById(packageId);
   if (!pkg) throw ApiError.notFound('Package not found');
   if (!pkg.isActive) throw ApiError.badRequest('This package is no longer available');
+
+  // Complete details required before a booking can be created
+  if (!venue || !String(venue).trim()) throw ApiError.badRequest('Enter the venue name to continue');
+  if (!address || !String(address).trim()) throw ApiError.badRequest('Enter the venue address to continue');
+
+  // Service area - we only cater events inside General Tinio, Nueva Ecija
+  if (!String(address).includes('General Tinio, Nueva Ecija')) {
+    throw ApiError.badRequest('We only cater events inside General Tinio, Nueva Ecija');
+  }
+
+  // 7-day lead time
+  const requested = new Date(eventDate);
+  if (Number.isNaN(requested.getTime())) throw ApiError.badRequest('Choose a valid event date');
+  if (requested < earliestEventDate()) {
+    throw ApiError.badRequest(
+      `Events must be booked at least ${LEAD_DAYS} days ahead - the earliest date is ${earliestEventDate().toISOString().slice(0, 10)}`
+    );
+  }
+
+  // One event per day - a date with an active booking is fully booked.
+  // Range match: stored dates may carry a time component (seed data).
+  const dayStart = new Date(requested);
+  dayStart.setUTCHours(0, 0, 0, 0);
+  const dayEnd = new Date(dayStart);
+  dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
+  const clash = await Booking.findOne({
+    eventDate: { $gte: dayStart, $lt: dayEnd },
+    status: { $ne: 'cancelled' },
+  });
+  if (clash) {
+    throw ApiError.badRequest('That date is already fully booked - please choose another date');
+  }
 
   if (guestCount < pkg.minGuests || guestCount > pkg.maxGuests) {
     throw ApiError.badRequest(
@@ -150,6 +232,19 @@ const cancel = asyncHandler(async (req, res) => {
     throw ApiError.badRequest(`Booking is already ${booking.status}`);
   }
 
+  // Paid bookings are locked - they are fixed and can no longer be cancelled
+  if (booking.paymentStatus === 'paid' || booking.paymentStatus === 'partial') {
+    throw ApiError.badRequest('Locked - this booking is fixed: details and cancellation can no longer be changed');
+  }
+
+  // Cancellations close CANCEL_CUTOFF_HOURS before the event starts
+  const msUntilStart = eventStart(booking.eventDate, booking.eventTime).getTime() - Date.now();
+  if (msUntilStart <= CANCEL_CUTOFF_HOURS * 60 * 60 * 1000) {
+    throw ApiError.badRequest(
+      `Cancellation closed - events can only be cancelled more than ${CANCEL_CUTOFF_HOURS} hours before the start time`
+    );
+  }
+
   booking.status = 'cancelled';
   await booking.save();
 
@@ -181,4 +276,4 @@ const quote = asyncHandler(async (req, res) => {
   res.json({ success: true, data: computeTotals(pkg, Number(guestCount), resolvedAddOns) });
 });
 
-module.exports = { list, getOne, create, updateStatus, cancel, quote, computeTotals };
+module.exports = { list, getOne, create, updateStatus, cancel, quote, takenDates, computeTotals };

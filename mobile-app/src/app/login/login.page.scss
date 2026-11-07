@@ -18,12 +18,15 @@
   display: grid;
   place-items: center;
   border-radius: 20px;
-  background: linear-gradient(140deg, var(--ion-color-primary), var(--ion-color-warning));
+  background: linear-gradient(140deg, var(--ion-color-primary), var(--ion-color-primary-tint));
   color: #fff;
   box-shadow: 0 8px 20px rgba(242, 118, 13, 0.32);
 
-  ion-icon {
-    font-size: 34px;
+  img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    display: block;
   }
 }
 

@@ -1,5 +1,6 @@
 const Package = require('../models/Package');
 const MenuItem = require('../models/MenuItem');
+const Booking = require('../models/Booking');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const slugify = require('../utils/slugify');
@@ -8,7 +9,10 @@ const slugify = require('../utils/slugify');
 const list = asyncHandler(async (req, res) => {
   const { search, category, isPopular, minPrice, maxPrice, page = 1, limit = 20 } = req.query;
 
-  const filter = { isActive: true };
+  // Admins manage inactive packages too; customers only see active ones.
+  const isAdmin = req.user?.role === 'admin';
+  const filter = {};
+  if (!isAdmin) filter.isActive = true;
   if (category) filter.category = category;
   if (isPopular === 'true') filter.isPopular = true;
   if (minPrice || maxPrice) {
@@ -21,17 +25,22 @@ const list = asyncHandler(async (req, res) => {
     filter.$or = [{ name: rx }, { description: rx }];
   }
 
-  const [items, total] = await Promise.all([
+  const [items, total, bookedRows] = await Promise.all([
     Package.find(filter)
       .sort({ isPopular: -1, createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(Number(limit)),
     Package.countDocuments(filter),
+    Booking.aggregate([
+      { $match: { status: { $ne: 'cancelled' } } },
+      { $group: { _id: '$package', count: { $sum: 1 } } },
+    ]),
   ]);
+  const booked = new Map(bookedRows.map((r) => [String(r._id), r.count]));
 
   res.json({
     success: true,
-    data: items,
+    data: items.map((p) => ({ ...p.toObject(), bookedCount: booked.get(String(p._id)) || 0 })),
     meta: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) },
   });
 });

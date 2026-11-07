@@ -51,6 +51,10 @@ const create = asyncHandler(async (req, res) => {
   if (req.user.role !== 'admin' && booking.customer.toString() !== req.user._id.toString()) {
     throw ApiError.forbidden('Not your booking');
   }
+  // Fully paid bookings are locked - additional payments are rejected
+  if (booking.paymentStatus === 'paid') {
+    throw ApiError.badRequest('This booking is already fully paid and locked');
+  }
   if (amount > booking.total) throw ApiError.badRequest('Amount exceeds booking total');
 
   const payment = await Payment.create({
@@ -79,7 +83,7 @@ const create = asyncHandler(async (req, res) => {
     data: { bookingId: booking._id },
   });
 
-  res.status(201).json({ success: true, data: payment });
+  res.status(201).json({ success: true, data: { ...payment.toObject(), booking } });
 });
 
 /** PUT /api/v1/payments/:id  (admin - verify / refund) */

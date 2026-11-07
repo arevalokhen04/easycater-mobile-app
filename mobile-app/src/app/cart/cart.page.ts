@@ -1,7 +1,8 @@
-﻿import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
+import { AlertController, LoadingController, ToastController } from '@ionic/angular';
 
+import { BookingService } from '../core/services/booking.service';
 import { CartService } from '../core/services/cart.service';
 
 @Component({
@@ -11,10 +12,15 @@ import { CartService } from '../core/services/cart.service';
   styleUrls: ['./cart.page.scss'],
 })
 export class CartPage implements OnInit {
+  readonly creating = signal(false);
+
   constructor(
     public cart: CartService,
+    private bookings: BookingService,
     private router: Router,
-    private alert: AlertController
+    private alert: AlertController,
+    private loading: LoadingController,
+    private toast: ToastController
   ) {}
 
   ngOnInit(): void {
@@ -48,12 +54,40 @@ export class CartPage implements OnInit {
     await alert.present();
   }
 
-  proceed(): void {
-    this.router.navigateByUrl('/payment', );
+  /**
+   * Creates the pending (unpaid) booking, then moves to payment. From here on
+   * the booking exists in My Bookings - payment locks it against cancellation.
+   */
+  async proceed(): Promise<void> {
+    if (this.creating()) return;
+
+    // A pending booking for this exact order already exists - just continue.
+    if (this.cart.activeBooking()) {
+      this.router.navigateByUrl('/payment');
+      return;
+    }
+
+    this.creating.set(true);
+    const loader = await this.loading.create({ message: 'Creating your booking...' });
+    await loader.present();
+
+    this.bookings.create(this.cart.state(), this.cart.totals()).subscribe({
+      next: (booking) => {
+        this.cart.setActiveBooking(booking);
+        this.creating.set(false);
+        loader.dismiss();
+        this.router.navigateByUrl('/payment');
+      },
+      error: (err: Error) => {
+        this.creating.set(false);
+        loader.dismiss();
+        this.notify(err?.message || 'Could not create the booking. Please check your details.');
+      },
+    });
+  }
+
+  private async notify(message: string): Promise<void> {
+    const t = await this.toast.create({ message, duration: 2400, position: 'bottom' });
+    await t.present();
   }
 }
-
-
-
-
-

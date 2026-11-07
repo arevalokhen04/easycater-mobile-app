@@ -92,7 +92,8 @@ const revenueChart = asyncHandler(async (req, res) => {
   }
 
   rows.forEach((r) => {
-    const idx = (r._id.year - since.getFullYear()) * 12 + (r._id.month - since.getMonth());
+    // $month is 1-based while getMonth() is 0-based - offset by one.
+    const idx = (r._id.year - since.getFullYear()) * 12 + (r._id.month - 1 - since.getMonth());
     if (labels[idx]) {
       labels[idx].revenue = r.revenue;
       labels[idx].count = r.count;

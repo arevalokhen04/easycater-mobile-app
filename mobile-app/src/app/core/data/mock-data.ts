@@ -314,6 +314,16 @@ const dayFromNow = (days: number): string => {
   return d.toISOString();
 };
 
+/** ~1 hour from now, expressed as a date string + "h:mm AM/PM" slot. */
+const startingSoon = (): { date: string; time: string } => {
+  const d = new Date(Date.now() + 60 * 60 * 1000);
+  const month = `${d.getMonth() + 1}`.padStart(2, '0');
+  const day = `${d.getDate()}`.padStart(2, '0');
+  const h12 = d.getHours() % 12 || 12;
+  const suffix = d.getHours() >= 12 ? 'PM' : 'AM';
+  return { date: `${d.getFullYear()}-${month}-${day}`, time: `${h12}:${`${d.getMinutes()}`.padStart(2, '0')} ${suffix}` };
+};
+
 export const MOCK_BOOKINGS: Booking[] = [
   {
     id: 'b-1',
@@ -325,8 +335,8 @@ export const MOCK_BOOKINGS: Booking[] = [
     eventDate: dayFromNow(45),
     eventTime: '4:00 PM',
     guestCount: 180,
-    venue: 'Grand Ballroom, Sapphire Hotel',
-    address: 'Rainbow Ave, Quezon City',
+    venue: 'EJJ Resort and Event Center',
+    address: 'Brgy. Poblacion East, General Tinio, Nueva Ecija',
     notes: 'Vegetarian options for 12 guests please.',
     addOns: [
       { menuItemId: 'm-10', name: 'Fresh Mango Juice', price: 120, quantity: 180 },
@@ -349,8 +359,8 @@ export const MOCK_BOOKINGS: Booking[] = [
     eventDate: dayFromNow(12),
     eventTime: '11:00 AM',
     guestCount: 60,
-    venue: 'Function Room 3, TechHub BGC',
-    address: '5th Ave, Taguig',
+    venue: 'Function Room, Sierra Casas Hotel',
+    address: 'Brgy. Poblacion Central, General Tinio, Nueva Ecija',
     notes: 'Include 2 gluten-free meals.',
     addOns: [],
     subtotal: 60 * 1200,
@@ -371,8 +381,8 @@ export const MOCK_BOOKINGS: Booking[] = [
     eventDate: dayFromNow(-30),
     eventTime: '2:00 PM',
     guestCount: 40,
-    venue: 'Home, Quezon City',
-    address: '78 Kamuning Rd, Quezon City',
+    venue: 'Family Residence',
+    address: 'Brgy. Sampaguita, General Tinio, Nueva Ecija',
     notes: '',
     addOns: [],
     subtotal: 40 * 550,
@@ -381,6 +391,29 @@ export const MOCK_BOOKINGS: Booking[] = [
     total: 0,
     status: 'completed',
     paymentStatus: 'paid',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    // Starts within the 2-hour cancellation window, so Cancel is disabled for it.
+    id: 'b-4',
+    bookingNumber: 'ECB-60583342',
+    packageId: 'p-3',
+    packageName: 'Merienda Plated',
+    packageImage: MOCK_PACKAGES[2].image,
+    eventType: 'birthday',
+    eventDate: startingSoon().date,
+    eventTime: startingSoon().time,
+    guestCount: 20,
+    venue: 'General Tinio Covered Court',
+    address: 'Brgy. Poblacion West, General Tinio, Nueva Ecija',
+    notes: '',
+    addOns: [],
+    subtotal: 20 * 550,
+    serviceCharge: 0,
+    tax: 0,
+    total: 0,
+    status: 'confirmed',
+    paymentStatus: 'unpaid',
     createdAt: new Date().toISOString(),
   },
 ];

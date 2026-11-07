@@ -1,0 +1,82 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Receipt</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mobile-app-wrapper">
+    @if (booking; as b) {
+      <div class="ec-form-wrap success-wrap">
+        <div class="success-hero">
+          <span class="success-check">
+            <ion-icon name="checkmark-circle"></ion-icon>
+          </span>
+          <h2>{{ paidInFull ? 'Booking received!' : 'Downpayment received!' }}</h2>
+          <p>
+            @if (paidInFull) {
+              Your event is booked. See you on {{ b.eventDate | date: 'MMM d, y' }}!
+            } @else {
+              Your booking is in. Pay the remaining balance anytime from My Bookings.
+            }
+          </p>
+        </div>
+
+        <ion-card class="ec-card receipt">
+          <div class="receipt-row ref">
+            <span>Booking number</span>
+            <strong>{{ b.bookingNumber }}</strong>
+          </div>
+          <div class="receipt-row">
+            <span>Package</span>
+            <strong>{{ b.packageName }}</strong>
+          </div>
+          <div class="receipt-row">
+            <span>Date &amp; time</span>
+            <strong>{{ b.eventDate | date: 'EEE, MMM d, y' }} &middot; {{ b.eventTime }}</strong>
+          </div>
+          <div class="receipt-row">
+            <span>Venue</span>
+            <strong>{{ b.venue }}</strong>
+          </div>
+          <div class="receipt-row">
+            <span>Guests</span>
+            <strong>{{ b.guestCount }} people</strong>
+          </div>
+          <div class="receipt-row divider"></div>
+          <div class="receipt-row">
+            <span>Paid now</span>
+            <strong>{{ currency(paidNow) }}</strong>
+          </div>
+          <div class="receipt-row">
+            <span>Reference</span>
+            <strong>{{ reference }}</strong>
+          </div>
+          @if (!paidInFull) {
+            <div class="receipt-row">
+              <span>Remaining balance</span>
+              <strong>{{ currency(remaining) }}</strong>
+            </div>
+          }
+          <div class="receipt-row">
+            <span>Receipt date</span>
+            <strong>{{ paidAtLabel }}</strong>
+          </div>
+        </ion-card>
+
+        <div class="ec-note">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          This booking is now fixed and locked - no more changes, no cancellation. Pay the
+          exact remaining balance from My Bookings if you paid a downpayment.
+        </div>
+
+        <ion-button class="ec-btn block" expand="block" (click)="viewBookings()">
+          View my bookings
+        </ion-button>
+        <ion-button class="ec-btn block ghost" expand="block" fill="outline" (click)="backHome()">
+          Back to home
+        </ion-button>
+      </div>
+    }
+  </div>
+</ion-content>

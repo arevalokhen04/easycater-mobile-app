@@ -45,6 +45,12 @@ const routes: Routes = [
     canActivate: [authGuard],
     loadChildren: () => import('./payment/payment-page.module').then((m) => m.PaymentPageModule),
   },
+  {
+    path: 'booking-success',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./booking-success/booking-success-page.module').then((m) => m.BookingSuccessPageModule),
+  },
 
   { path: '', redirectTo: 'tabs/home', pathMatch: 'full' },
   { path: '**', redirectTo: 'tabs/home' },
