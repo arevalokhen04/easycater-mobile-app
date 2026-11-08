@@ -45,8 +45,10 @@ function eventStart(eventDate, eventTime) {
 
 /** GET /api/v1/bookings/taken-dates - dates that already hold an active booking */
 const takenDates = asyncHandler(async (_req, res) => {
+  // Only live bookings hold a date: cancelled events freed it, and completed
+  // events are finished - their day must be bookable again.
   const rows = await Booking.aggregate([
-    { $match: { status: { $ne: 'cancelled' } } },
+    { $match: { status: { $nin: ['cancelled', 'completed'] } } },
     { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$eventDate' } } } },
     { $sort: { _id: 1 } },
   ]);
