@@ -86,25 +86,30 @@
 }
 
 .option-row {
-  display: flex;
-  gap: 8px;
+  display: inline-flex;
+  gap: 2px;
+  padding: 4px;
+  background: #f6f3f0;
+  border: 1px solid #eee2d8;
+  border-radius: 999px;
 }
 
 .pill {
   padding: 9px 18px;
-  border: 1px solid #dcdce3;
+  border: 0;
   border-radius: 999px;
-  background: var(--ec-surface);
-  color: var(--ec-ink);
+  background: transparent;
+  color: #8a7a6e;
   font: inherit;
   font-size: 0.86rem;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
 
   &.on {
     background: var(--ion-color-primary);
-    border-color: var(--ion-color-primary);
     color: #fff;
+    box-shadow: 0 2px 8px rgba(234, 88, 12, 0.35);
   }
 }
 
