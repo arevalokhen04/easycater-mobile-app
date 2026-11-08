@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { AlertController, ModalController, ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 
 import { AdminDataService } from '../core/services/admin-data.service';
 import { AdminPackage } from '../core/models/admin.models';
@@ -29,8 +29,7 @@ export class PackagesAdminPage implements OnInit {
   constructor(
     private data: AdminDataService,
     private alert: AlertController,
-    private toast: ToastController,
-    private modal: ModalController
+    private toast: ToastController
   ) {}
 
   ngOnInit(): void {
