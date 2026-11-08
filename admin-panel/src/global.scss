@@ -277,6 +277,44 @@ table.data {
 .tag.soon { background: var(--ion-color-primary); }
 .tag.grey { background: #9ca3af; }
 
+/* -------------------------------------------------------- Filter chips -- */
+/* Segmented control: one rounded track, active segment is solid orange.   */
+
+.chips {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 6px;
+  padding: 4px;
+  background: #f6f3f0;
+  border: 1px solid #eee2d8;
+  border-radius: 999px;
+}
+
+.chip {
+  padding: 7px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #8a7a6e;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    background: rgba(234, 88, 12, 0.09);
+    color: var(--ec-ink);
+  }
+
+  &.on {
+    background: var(--ion-color-primary);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(234, 88, 12, 0.35);
+  }
+}
+
 /* --------------------------------------------------------------- Chart -- */
 
 .bars {
