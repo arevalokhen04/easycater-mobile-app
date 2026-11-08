@@ -1,9 +1,14 @@
 <ion-app>
   <ion-split-pane contentId="admin-content" when="lg">
-    <ion-menu contentId="admin-content" type="overlay">
+    <ion-menu contentId="admin-content">
       <ion-header>
         <ion-toolbar color="primary">
-          <ion-title>EasyCater</ion-title>
+          <ion-title>
+            <span class="brand-inline">
+              <img src="assets/easycater-mark-white.png" alt="" />
+              EasyCater Admin
+            </span>
+          </ion-title>
         </ion-toolbar>
       </ion-header>
 
@@ -47,6 +52,22 @@
       </ion-footer>
     </ion-menu>
 
-    <ion-router-outlet id="admin-content"></ion-router-outlet>
+    <ion-tabs id="admin-content">
+      <!-- NOTE: ion-tabs creates its own internal ion-router-outlet inside
+           .tabs-inner - adding an explicit one stacks an EMPTY outlet on top
+           of the pages, which swallows every tap on page content (the exact
+           "only the bottom tabs respond" bug). Keep this slot empty. -->
+
+      <!-- Bottom tab navigation on phones/tablets; the desktop keeps the
+           sidenav (this bar hides at the lg breakpoint). -->
+      <ion-tab-bar slot="bottom">
+        @for (link of tabLinks; track link.path) {
+          <ion-tab-button [routerLink]="link.path" routerLinkActive="tab-selected">
+            <ion-icon [name]="link.icon"></ion-icon>
+            <ion-label>{{ link.label }}</ion-label>
+          </ion-tab-button>
+        }
+      </ion-tab-bar>
+    </ion-tabs>
   </ion-split-pane>
 </ion-app>

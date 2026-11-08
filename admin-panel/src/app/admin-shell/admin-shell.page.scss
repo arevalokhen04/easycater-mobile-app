@@ -61,3 +61,52 @@ ion-list-header {
     color: var(--ion-color-medium);
   }
 }
+
+/* ---- Bottom tab bar (phones/tablets) - customer-app styling ---- */
+ion-tab-bar {
+  --background: #ffffff;
+  --color: #9ca3af;
+  --color-selected: var(--ion-color-primary);
+  border-top: 1px solid #f0f0f4;
+  height: 56px;
+
+  ion-tab-button {
+    font-size: 0.64rem;
+    font-weight: 600;
+    min-height: 44px;
+  }
+
+  ion-icon {
+    font-size: 19px;
+  }
+}
+
+// Desktop (lg+): the sidenav takes over - hide the bottom bar.
+@media (min-width: 992px) {
+  ion-tab-bar {
+    display: none;
+  }
+}
+
+/* Desktop split-pane: force the inline layout. The overlay menu type gives
+   the content position:absolute (fine on phones where the menu overlays),
+   which would otherwise cover the inline menu at lg+. */
+@media (min-width: 992px) {
+  ion-tabs.split-pane-main {
+    position: relative !important;
+  }
+
+  ion-menu.split-pane-side {
+    display: flex !important;
+    position: relative !important;
+  }
+}
+
+// Active bottom tab - orange, matching the customer app.
+ion-tab-button.tab-selected {
+  --color: var(--ion-color-primary);
+
+  ion-icon {
+    color: var(--ion-color-primary);
+  }
+}

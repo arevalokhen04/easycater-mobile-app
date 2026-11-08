@@ -81,7 +81,9 @@
       </ion-label>
     </ion-item>
 
-    <ion-button class="ec-btn block" expand="block" (click)="submit()">Create Account</ion-button>
+    <ion-button class="ec-btn block" expand="block" [disabled]="busy()" (click)="submit()">
+      {{ busy() ? 'Creating account...' : 'Create Account' }}
+    </ion-button>
 
     <div class="alt">
       <span>Already have an account?</span>

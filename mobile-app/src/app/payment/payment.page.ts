@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { LoadingController, ToastController } from '@ionic/angular';
+import { ToastController } from '@ionic/angular';
 
 import { CartService } from '../core/services/cart.service';
 import { PaymentService } from '../core/services/payment.service';
@@ -27,7 +27,6 @@ export class PaymentPage implements OnInit {
     private bookingService: BookingService,
     private notifications: NotificationService,
     private router: Router,
-    private loading: LoadingController,
     private toast: ToastController
   ) {}
 
@@ -115,14 +114,12 @@ export class PaymentPage implements OnInit {
       return;
     }
 
+    // Inline button state instead of a blocking overlay - no stuck backdrops.
     this.submitting.set(true);
-    const loader = await this.loading.create({ message: 'Processing payment...' });
-    await loader.present();
 
     this.paymentService.pay(booking, amount, this.selectedMethod()).subscribe({
       next: (payment) => {
         this.submitting.set(false);
-        loader.dismiss();
 
         this.notifications.push({
           title: 'Payment received',
@@ -142,7 +139,6 @@ export class PaymentPage implements OnInit {
       error: () => {
         // Everything the user picked stays intact (Nielsen #9 - keep their work).
         this.submitting.set(false);
-        loader.dismiss();
         this.notify('Payment did not go through. Your booking is safe - please try again.');
       },
     });

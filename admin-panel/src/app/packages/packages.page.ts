@@ -13,6 +13,18 @@ import { AdminPackage } from '../core/models/admin.models';
 export class PackagesAdminPage implements OnInit {
   readonly packages = signal<AdminPackage[]>([]);
   readonly search = signal('');
+  readonly loading = signal(true);
+  readonly busy = signal(false);
+
+  /** Constrained choices (error prevention) - no free-text categories. */
+  readonly categoryChoices = [
+    { value: 'wedding', label: 'Wedding' },
+    { value: 'corporate', label: 'Corporate' },
+    { value: 'birthday', label: 'Birthday' },
+    { value: 'christening', label: 'Christening' },
+    { value: 'graduation', label: 'Graduation' },
+    { value: 'other', label: 'Other' },
+  ];
 
   constructor(
     private data: AdminDataService,
@@ -37,26 +49,51 @@ export class PackagesAdminPage implements OnInit {
   async createPackage(): Promise<void> {
     const alert = await this.alert.create({
       header: 'New package',
+      message: 'Pick a category, then set the name and price per head.',
       inputs: [
         { name: 'name', placeholder: 'Package name', type: 'text' },
-        { name: 'price', placeholder: 'Price per head', type: 'number' },
-        { name: 'category', placeholder: 'wedding | corporate | birthday | other', type: 'text' },
+        { name: 'price', placeholder: 'Price per head (PHP)', type: 'number', min: 1 },
+        ...this.categoryChoices.map((c, i) => ({
+          name: 'category',
+          type: 'radio' as const,
+          label: c.label,
+          value: c.value,
+          checked: i === 0,
+        })),
       ],
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
           text: 'Create',
           handler: (data: Record<string, string>) => {
-            if (!data['name']?.trim()) return false;
+            const name = data['name']?.trim();
+            const price = Number(data['price']);
+            // Error prevention: validate before anything is saved.
+            if (!name) {
+              this.notify('Enter the package name first');
+              return false;
+            }
+            if (!price || price <= 0) {
+              this.notify('Enter a price above PHP 0');
+              return false;
+            }
+            this.busy.set(true);
             this.data
               .savePackage({
-                name: data['name'].trim(),
-                pricePerHead: Number(data['price']) || 0,
-                category: (data['category'] || 'other').toLowerCase(),
+                name,
+                pricePerHead: price,
+                category: data['category'] || 'other',
               })
-              .subscribe(() => {
-                this.load();
-                this.notify('Package created');
+              .subscribe({
+                next: () => {
+                  this.busy.set(false);
+                  this.load();
+                  this.notify('Package created');
+                },
+                error: (err: Error) => {
+                  this.busy.set(false);
+                  this.notify(err.message);
+                },
               });
             return true;
           },
@@ -67,12 +104,18 @@ export class PackagesAdminPage implements OnInit {
   }
 
   toggleActive(pkg: AdminPackage): void {
+    if (this.busy()) return;
+    this.busy.set(true);
     this.data.togglePackageActive(pkg.id).subscribe({
       next: () => {
+        this.busy.set(false);
         this.load();
         this.notify(`${pkg.name} is now ${pkg.isActive ? 'hidden' : 'visible'}`);
       },
-      error: (err: Error) => this.notify(err.message),
+      error: (err: Error) => {
+        this.busy.set(false);
+        this.notify(err.message);
+      },
     });
   }
 
@@ -101,7 +144,17 @@ export class PackagesAdminPage implements OnInit {
   }
 
   private load(): void {
-    this.data.getPackages(this.search()).subscribe((list) => this.packages.set(list));
+    this.loading.set(true);
+    this.data.getPackages(this.search()).subscribe({
+      next: (list) => {
+        this.packages.set(list);
+        this.loading.set(false);
+      },
+      error: (err: Error) => {
+        this.loading.set(false);
+        this.notify(err.message);
+      },
+    });
   }
 
   private async notify(message: string): Promise<void> {

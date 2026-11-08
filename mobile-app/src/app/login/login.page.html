@@ -44,7 +44,9 @@
         </ion-button>
       </ion-item>
 
-      <ion-button class="ec-btn block" expand="block" (click)="submit()">Sign In</ion-button>
+      <ion-button class="ec-btn block" expand="block" [disabled]="busy()" (click)="submit()">
+        {{ busy() ? 'Signing in...' : 'Sign In' }}
+      </ion-button>
 
       <ion-button fill="clear" size="small" type="button" (click)="useDemoAccount()">
         Use demo account

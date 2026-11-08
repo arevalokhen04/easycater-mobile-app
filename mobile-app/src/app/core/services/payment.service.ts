@@ -17,7 +17,8 @@ interface PaymentRow {
   method: PaymentMethod;
   status: Payment['status'];
   paidAt?: string;
-  booking?: { _id?: string; paymentStatus?: Booking['paymentStatus']; amountPaid?: number };
+  booking?: { _id?: string; paymentStatus?: Booking['paymentStatus']; amountPaid?: number; bookingNumber?: string } | string;
+  user?: { name?: string } | string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -39,10 +40,24 @@ export class PaymentService {
     if (environment.useMockData) {
       return of([...this.payments]).pipe(delay(200));
     }
-    // Not rendered anywhere yet - wired for completeness.
+    // Admin view - rows include the populated booking + payer.
     return this.api
       .get<PaymentRow[]>('/payments', { limit: 100 })
       .pipe(map((rows) => rows.map((p) => this.mapPayment(p, undefined))));
+  }
+
+  /** Admin action - verify (paid) or refund a payment. */
+  updatePaymentStatus(id: string, status: Payment['status']): Observable<Payment> {
+    if (environment.useMockData) {
+      const payment = this.payments.find((p) => p.id === id);
+      if (!payment) return throwError(() => new Error('Payment not found'));
+      payment.status = status;
+      return of({ ...payment }).pipe(delay(300));
+    }
+
+    return this.api
+      .put<PaymentRow>(`/payments/${id}`, { status })
+      .pipe(map((row) => this.mapPayment(row, undefined)));
   }
 
   /** Mock charge in mock mode; a real gateway would slot in here (PayMongo etc). */
@@ -81,18 +96,22 @@ export class PaymentService {
 
   /** Normalize the row and copy the fresh booking state onto the caller's object. */
   private mapPayment(row: PaymentRow, booking: Booking | undefined): Payment {
-    if (booking && row.booking) {
-      booking.paymentStatus = row.booking.paymentStatus ?? booking.paymentStatus;
-      booking.amountPaid = row.booking.amountPaid ?? booking.amountPaid;
+    const rowBooking = row.booking && typeof row.booking === 'object' ? row.booking : undefined;
+    if (booking && rowBooking) {
+      booking.paymentStatus = rowBooking.paymentStatus ?? booking.paymentStatus;
+      booking.amountPaid = rowBooking.amountPaid ?? booking.amountPaid;
     }
+    const payer = row.user && typeof row.user === 'object' ? row.user : undefined;
     return {
       id: (row._id ?? row.id) as string,
-      bookingId: booking?.id ?? '',
+      bookingId: (rowBooking?._id ?? booking?.id ?? '') as string,
       referenceNumber: row.referenceNumber,
       amount: row.amount,
       method: row.method,
       status: row.status,
       paidAt: row.paidAt,
+      bookingNumber: rowBooking?.bookingNumber,
+      customerName: payer?.name,
     };
   }
 }

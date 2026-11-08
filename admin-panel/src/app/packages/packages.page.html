@@ -24,63 +24,109 @@
 
 <ion-content [fullscreen]="true">
   <div class="admin-page">
-    <div class="panel">
-      <div class="panel-head">
-        <h2>{{ packages().length }} package(s)</h2>
+    @if (loading()) {
+      <div class="panel">
+        <div class="skeleton-rows">
+          @for (i of [1, 2, 3, 4, 5]; track i) {
+            <ion-skeleton-text [animated]="true" style="width: 100%; height: 44px"></ion-skeleton-text>
+          }
+        </div>
       </div>
-      <div class="table-wrap">
-        @if (packages().length === 0) {
-          <div class="empty-row">No packages match your search.</div>
-        } @else {
-          <table class="data">
-            <thead>
-              <tr>
-                <th>Package</th>
-                <th>Category</th>
-                <th>Price / head</th>
-                <th>Guest range</th>
-                <th>Booked</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (p of packages(); track p.id) {
+    } @else if (packages().length === 0) {
+      <div class="panel">
+        <div class="empty-row">No packages match your search.</div>
+      </div>
+    } @else {
+      <!-- Desktop: full table -->
+      <div class="table-view">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>{{ packages().length }} package(s)</h2>
+          </div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
                 <tr>
-                  <td>
-                    <div class="cell-user">
-                      <img class="mini-avatar" style="object-fit: cover" [src]="p.image" [alt]="p.name" />
-                      <div class="cell-text">
-                        <strong>{{ p.name }}</strong>
-                        @if (p.isPopular) {
-                          <small>Featured</small>
-                        }
-                      </div>
-                    </div>
-                  </td>
-                  <td>{{ p.category | titlecase }}</td>
-                  <td class="money">{{ money(p.pricePerHead) }}</td>
-                  <td>{{ p.minGuests }}&ndash;{{ p.maxGuests }}</td>
-                  <td>{{ p.bookedCount }}</td>
-                  <td>
-                    <span class="tag" [ngClass]="p.isActive ? 'ok' : 'grey'">
-                      {{ p.isActive ? 'active' : 'hidden' }}
-                    </span>
-                  </td>
-                  <td>
-                    <ion-button fill="clear" size="small" (click)="toggleActive(p)">
-                      {{ p.isActive ? 'Hide' : 'Show' }}
-                    </ion-button>
-                    <ion-button fill="clear" size="small" color="danger" (click)="confirmDelete(p)">
-                      <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                    </ion-button>
-                  </td>
+                  <th>Package</th>
+                  <th>Category</th>
+                  <th>Price / head</th>
+                  <th>Guest range</th>
+                  <th>Booked</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (p of packages(); track p.id) {
+                  <tr>
+                    <td>
+                      <div class="cell-user">
+                        <img class="mini-avatar" style="object-fit: cover" [src]="p.image" [alt]="p.name" />
+                        <div class="cell-text">
+                          <strong>{{ p.name }}</strong>
+                          @if (p.isPopular) {
+                            <small>Featured</small>
+                          }
+                        </div>
+                      </div>
+                    </td>
+                    <td>{{ p.category | titlecase }}</td>
+                    <td class="money">{{ money(p.pricePerHead) }}</td>
+                    <td>{{ p.minGuests }}&ndash;{{ p.maxGuests }}</td>
+                    <td>{{ p.bookedCount }}</td>
+                    <td>
+                      <span class="tag" [ngClass]="p.isActive ? 'ok' : 'grey'">
+                        {{ p.isActive ? 'active' : 'hidden' }}
+                      </span>
+                    </td>
+                    <td>
+                      <ion-button fill="clear" size="small" [disabled]="busy()" (click)="toggleActive(p)">
+                        {{ p.isActive ? 'Hide' : 'Show' }}
+                      </ion-button>
+                      <ion-button fill="clear" size="small" color="danger" [disabled]="busy()" (click)="confirmDelete(p)">
+                        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                      </ion-button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile: package cards with inline actions -->
+      <div class="card-view">
+        <h2 class="card-count">{{ packages().length }} package(s)</h2>
+        @for (p of packages(); track p.id) {
+          <div class="panel mob-card">
+            <div class="mob-card-body">
+              <div class="mob-row">
+                <h3>{{ p.name }}</h3>
+                <span class="tag" [ngClass]="p.isActive ? 'ok' : 'grey'">
+                  {{ p.isActive ? 'active' : 'hidden' }}
+                </span>
+              </div>
+              <p class="card-ref">{{ p.category | titlecase }} @if (p.isPopular) { · Featured }</p>
+
+              <div class="card-facts">
+                <span><ion-icon name="cash-outline"></ion-icon> {{ money(p.pricePerHead) }} / head</span>
+                <span><ion-icon name="people-outline"></ion-icon> {{ p.minGuests }}&ndash;{{ p.maxGuests }}</span>
+                <span><ion-icon name="calendar-outline"></ion-icon> {{ p.bookedCount }} booked</span>
+              </div>
+
+              <div class="mob-actions">
+                <ion-button fill="outline" size="small" [disabled]="busy()" (click)="toggleActive(p)">
+                  {{ p.isActive ? 'Hide' : 'Show' }}
+                </ion-button>
+                <ion-button fill="outline" size="small" color="danger" [disabled]="busy()" (click)="confirmDelete(p)">
+                  Delete
+                </ion-button>
+              </div>
+            </div>
+          </div>
         }
       </div>
-    </div>
+    }
   </div>
 </ion-content>

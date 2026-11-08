@@ -1,4 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
+import { AlertController, ToastController } from '@ionic/angular';
 
 import { AdminDataService } from '../core/services/admin-data.service';
 import { AdminPayment } from '../core/models/admin.models';
@@ -14,8 +15,14 @@ export class PaymentsAdminPage implements OnInit {
 
   readonly payments = signal<AdminPayment[]>([]);
   readonly activeStatus = signal('all');
+  readonly loading = signal(true);
+  readonly busy = signal(false);
 
-  constructor(private data: AdminDataService) {}
+  constructor(
+    private data: AdminDataService,
+    private alert: AlertController,
+    private toast: ToastController
+  ) {}
 
   ngOnInit(): void {
     this.load();
@@ -31,11 +38,52 @@ export class PaymentsAdminPage implements OnInit {
   }
 
   verify(payment: AdminPayment): void {
-    this.data.updatePaymentStatus(payment.id, 'paid').subscribe({ next: () => this.load() });
+    if (this.busy()) return;
+    this.busy.set(true);
+    this.data.updatePaymentStatus(payment.id, 'paid').subscribe({
+      next: () => {
+        this.busy.set(false);
+        this.load();
+        this.notify(`${payment.referenceNumber} verified`);
+      },
+      error: (err: Error) => {
+        this.busy.set(false);
+        this.notify(err.message);
+      },
+    });
   }
 
-  refund(payment: AdminPayment): void {
-    this.data.updatePaymentStatus(payment.id, 'refunded').subscribe({ next: () => this.load() });
+  /** Refund moves real money - always confirm first (error prevention). */
+  async refund(payment: AdminPayment): Promise<void> {
+    const alert = await this.alert.create({
+      header: 'Refund this payment?',
+      message: `${payment.referenceNumber} — ${this.money(payment.amount)} (${
+        payment.customerName ?? 'customer'
+      }) will be marked as refunded.`,
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Refund',
+          role: 'destructive',
+          handler: () => {
+            if (this.busy()) return;
+            this.busy.set(true);
+            this.data.updatePaymentStatus(payment.id, 'refunded').subscribe({
+              next: () => {
+                this.busy.set(false);
+                this.load();
+                this.notify(`${payment.referenceNumber} refunded`);
+              },
+              error: (err: Error) => {
+                this.busy.set(false);
+                this.notify(err.message);
+              },
+            });
+          },
+        },
+      ],
+    });
+    await alert.present();
   }
 
   statusClass(status: string): string {
@@ -51,6 +99,18 @@ export class PaymentsAdminPage implements OnInit {
       default:
         return 'grey';
     }
+  }
+
+  /** Friendly payment method names (H2 - speak the user's language). */
+  methodLabel(method: string): string {
+    const map: Record<string, string> = {
+      gcash: 'GCash',
+      maya: 'Maya',
+      'credit-card': 'Credit Card',
+      'bank-transfer': 'Bank Transfer',
+      cash: 'Cash',
+    };
+    return map[method] ?? method;
   }
 
   methodIcon(method: string): string {
@@ -83,6 +143,21 @@ export class PaymentsAdminPage implements OnInit {
   }
 
   private load(): void {
-    this.data.getPayments(this.activeStatus()).subscribe((list) => this.payments.set(list));
+    this.loading.set(true);
+    this.data.getPayments(this.activeStatus()).subscribe({
+      next: (list) => {
+        this.payments.set(list);
+        this.loading.set(false);
+      },
+      error: (err: Error) => {
+        this.loading.set(false);
+        this.notify(err.message);
+      },
+    });
+  }
+
+  private async notify(message: string): Promise<void> {
+    const t = await this.toast.create({ message, duration: 2200, position: 'bottom' });
+    await t.present();
   }
 }

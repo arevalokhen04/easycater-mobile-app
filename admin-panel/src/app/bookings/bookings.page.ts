@@ -1,4 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
+import { ToastController } from '@ionic/angular';
 
 import { AdminDataService } from '../core/services/admin-data.service';
 import { AdminBooking } from '../core/models/admin.models';
@@ -22,8 +23,13 @@ export class BookingsAdminPage implements OnInit {
 
   readonly bookings = signal<AdminBooking[]>([]);
   readonly activeStatus = signal('all');
+  readonly loading = signal(true);
+  readonly busy = signal(false);
 
-  constructor(private data: AdminDataService) {}
+  constructor(
+    private data: AdminDataService,
+    private toast: ToastController
+  ) {}
 
   ngOnInit(): void {
     this.load();
@@ -47,7 +53,19 @@ export class BookingsAdminPage implements OnInit {
   }
 
   updateStatus(booking: AdminBooking, status: string): void {
-    this.data.updateBookingStatus(booking.id, status).subscribe({ next: () => this.load() });
+    if (this.busy()) return;
+    this.busy.set(true);
+    this.data.updateBookingStatus(booking.id, status).subscribe({
+      next: () => {
+        this.busy.set(false);
+        this.load();
+        this.notify(`${booking.bookingNumber} is now ${status}`);
+      },
+      error: (err: Error) => {
+        this.busy.set(false);
+        this.notify(err.message);
+      },
+    });
   }
 
   statusClass(status: string): string {
@@ -82,6 +100,21 @@ export class BookingsAdminPage implements OnInit {
   }
 
   private load(): void {
-    this.data.getBookings(this.activeStatus()).subscribe((list) => this.bookings.set(list));
+    this.loading.set(true);
+    this.data.getBookings(this.activeStatus()).subscribe({
+      next: (list) => {
+        this.bookings.set(list);
+        this.loading.set(false);
+      },
+      error: (err: Error) => {
+        this.loading.set(false);
+        this.notify(err.message);
+      },
+    });
+  }
+
+  private async notify(message: string): Promise<void> {
+    const t = await this.toast.create({ message, duration: 2200, position: 'bottom' });
+    await t.present();
   }
 }

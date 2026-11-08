@@ -13,6 +13,8 @@ import { AdminUser } from '../core/models/admin.models';
 export class CustomersAdminPage implements OnInit {
   readonly customers = signal<AdminUser[]>([]);
   readonly search = signal('');
+  readonly loading = signal(true);
+  readonly busy = signal(false);
 
   constructor(
     private data: AdminDataService,
@@ -42,12 +44,18 @@ export class CustomersAdminPage implements OnInit {
   }
 
   toggleActive(c: AdminUser): void {
+    if (this.busy()) return;
+    this.busy.set(true);
     this.data.toggleCustomerActive(c.id).subscribe({
       next: () => {
+        this.busy.set(false);
         this.load();
         this.notify(`${c.name} is now ${c.isActive ? 'disabled' : 'enabled'}`);
       },
-      error: (err: Error) => this.notify(err.message),
+      error: (err: Error) => {
+        this.busy.set(false);
+        this.notify(err.message);
+      },
     });
   }
 
@@ -61,12 +69,18 @@ export class CustomersAdminPage implements OnInit {
           text: 'Delete',
           role: 'destructive',
           handler: () => {
+            if (this.busy()) return;
+            this.busy.set(true);
             this.data.deleteCustomer(c.id).subscribe({
               next: () => {
+                this.busy.set(false);
                 this.load();
                 this.notify('Customer deleted');
               },
-              error: (err: Error) => this.notify(err.message),
+              error: (err: Error) => {
+                this.busy.set(false);
+                this.notify(err.message);
+              },
             });
           },
         },
@@ -76,7 +90,17 @@ export class CustomersAdminPage implements OnInit {
   }
 
   private load(): void {
-    this.data.getCustomers(this.search()).subscribe((list) => this.customers.set(list));
+    this.loading.set(true);
+    this.data.getCustomers(this.search()).subscribe({
+      next: (list) => {
+        this.customers.set(list);
+        this.loading.set(false);
+      },
+      error: (err: Error) => {
+        this.loading.set(false);
+        this.notify(err.message);
+      },
+    });
   }
 
   private async notify(message: string): Promise<void> {

@@ -8,4 +8,7 @@ export interface Payment {
   method: PaymentMethod;
   status: 'pending' | 'paid' | 'failed' | 'refunded';
   paidAt?: string;
+  /** Populated for admins (GET /payments includes booking + payer). */
+  bookingNumber?: string;
+  customerName?: string;
 }

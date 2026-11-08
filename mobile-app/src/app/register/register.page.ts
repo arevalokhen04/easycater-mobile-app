@@ -1,6 +1,6 @@
-﻿import { Component, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, LoadingController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 
 import { AuthService } from '../core/services/auth.service';
 
@@ -16,17 +16,18 @@ export class RegisterPage {
   readonly phone = signal('');
   readonly password = signal('');
   readonly confirmPassword = signal('');
+  readonly busy = signal(false);
   showPassword = false;
   agreed = false;
 
   constructor(
     private auth: AuthService,
     private router: Router,
-    private loading: LoadingController,
     private alert: AlertController
   ) {}
 
   async submit(): Promise<void> {
+    if (this.busy()) return;
     if (!this.name().trim() || !this.email().trim() || !this.password() || !this.confirmPassword()) {
       await this.show('Please fill in all required fields', 'Missing details');
       return;
@@ -44,9 +45,8 @@ export class RegisterPage {
       return;
     }
 
-    const loader = await this.loading.create({ message: 'Creating account...' });
-    await loader.present();
-
+    // Inline button state instead of a blocking overlay - no stuck backdrops.
+    this.busy.set(true);
     this.auth
       .register({
         name: this.name().trim(),
@@ -56,11 +56,11 @@ export class RegisterPage {
       })
       .subscribe({
         next: () => {
-          loader.dismiss();
+          this.busy.set(false);
           this.router.navigateByUrl('/tabs/home', { replaceUrl: true });
         },
         error: (err: Error) => {
-          loader.dismiss();
+          this.busy.set(false);
           this.show(err.message, 'Registration failed');
         },
       });
@@ -71,6 +71,3 @@ export class RegisterPage {
     await alert.present();
   }
 }
-
-
-

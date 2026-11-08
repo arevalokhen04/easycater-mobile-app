@@ -21,6 +21,9 @@ export interface Booking {
   packageId: string;
   packageName?: string;
   packageImage?: string;
+  /** Populated for admins (GET /bookings returns all customers' bookings). */
+  customerName?: string;
+  customerEmail?: string;
   eventType: string;
   eventDate: string;
   eventTime: string;

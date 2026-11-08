@@ -18,59 +18,105 @@
 
 <ion-content [fullscreen]="true">
   <div class="admin-page">
-    <div class="panel">
-      <div class="panel-head"><h2>{{ customers().length }} customer(s)</h2></div>
-      <div class="table-wrap">
-        @if (customers().length === 0) {
-          <div class="empty-row">No customers match your search.</div>
-        } @else {
-          <table class="data">
-            <thead>
-              <tr>
-                <th>Customer</th>
-                <th>Phone</th>
-                <th>Joined</th>
-                <th>Bookings</th>
-                <th>Total spent</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (c of customers(); track c.id) {
+    @if (loading()) {
+      <div class="panel">
+        <div class="skeleton-rows">
+          @for (i of [1, 2, 3, 4, 5]; track i) {
+            <ion-skeleton-text [animated]="true" style="width: 100%; height: 44px"></ion-skeleton-text>
+          }
+        </div>
+      </div>
+    } @else if (customers().length === 0) {
+      <div class="panel">
+        <div class="empty-row">No customers match your search.</div>
+      </div>
+    } @else {
+      <!-- Desktop: full table -->
+      <div class="table-view">
+        <div class="panel">
+          <div class="panel-head"><h2>{{ customers().length }} customer(s)</h2></div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
                 <tr>
-                  <td>
-                    <div class="cell-user">
-                      <div class="mini-avatar">{{ initials(c.name) }}</div>
-                      <div class="cell-text">
-                        <strong>{{ c.name }}</strong>
-                        <small>{{ c.email }}</small>
-                      </div>
-                    </div>
-                  </td>
-                  <td>{{ c.phone || '—' }}</td>
-                  <td>{{ c.joinedAt | date: 'MMM d, y' }}</td>
-                  <td>{{ c.bookings }}</td>
-                  <td class="money">{{ money(c.totalSpent) }}</td>
-                  <td>
-                    <span class="tag" [ngClass]="c.isActive ? 'ok' : 'grey'">
-                      {{ c.isActive ? 'active' : 'disabled' }}
-                    </span>
-                  </td>
-                  <td>
-                    <ion-button fill="clear" size="small" (click)="toggleActive(c)">
-                      {{ c.isActive ? 'Disable' : 'Enable' }}
-                    </ion-button>
-                    <ion-button fill="clear" size="small" color="danger" (click)="confirmDelete(c)">
-                      <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                    </ion-button>
-                  </td>
+                  <th>Customer</th>
+                  <th>Phone</th>
+                  <th>Joined</th>
+                  <th>Bookings</th>
+                  <th>Total spent</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (c of customers(); track c.id) {
+                  <tr>
+                    <td>
+                      <div class="cell-user">
+                        <div class="mini-avatar">{{ initials(c.name) }}</div>
+                        <div class="cell-text">
+                          <strong>{{ c.name }}</strong>
+                          <small>{{ c.email }}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{{ c.phone || '—' }}</td>
+                    <td>{{ c.joinedAt | date: 'MMM d, y' }}</td>
+                    <td>{{ c.bookings }}</td>
+                    <td class="money">{{ money(c.totalSpent) }}</td>
+                    <td>
+                      <span class="tag" [ngClass]="c.isActive ? 'ok' : 'grey'">
+                        {{ c.isActive ? 'active' : 'disabled' }}
+                      </span>
+                    </td>
+                    <td>
+                      <ion-button fill="clear" size="small" [disabled]="busy()" (click)="toggleActive(c)">
+                        {{ c.isActive ? 'Disable' : 'Enable' }}
+                      </ion-button>
+                      <ion-button fill="clear" size="small" color="danger" [disabled]="busy()" (click)="confirmDelete(c)">
+                        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                      </ion-button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile: customer cards with inline actions -->
+      <div class="card-view">
+        <h2 class="card-count">{{ customers().length }} customer(s)</h2>
+        @for (c of customers(); track c.id) {
+          <div class="panel mob-card">
+            <div class="mob-card-body">
+              <div class="mob-row">
+                <h3>{{ c.name }}</h3>
+                <span class="tag" [ngClass]="c.isActive ? 'ok' : 'grey'">
+                  {{ c.isActive ? 'active' : 'disabled' }}
+                </span>
+              </div>
+              <p class="card-ref">{{ c.email }} · {{ c.phone || 'no phone' }}</p>
+
+              <div class="card-facts">
+                <span><ion-icon name="calendar-outline"></ion-icon> {{ c.bookings }} bookings</span>
+                <span><ion-icon name="cash-outline"></ion-icon> {{ money(c.totalSpent) }} spent</span>
+                <span><ion-icon name="time-outline"></ion-icon> Joined {{ c.joinedAt | date: 'MMM d, y' }}</span>
+              </div>
+
+              <div class="mob-actions">
+                <ion-button fill="outline" size="small" [disabled]="busy()" (click)="toggleActive(c)">
+                  {{ c.isActive ? 'Disable' : 'Enable' }}
+                </ion-button>
+                <ion-button fill="outline" size="small" color="danger" [disabled]="busy()" (click)="confirmDelete(c)">
+                  Delete
+                </ion-button>
+              </div>
+            </div>
+          </div>
         }
       </div>
-    </div>
+    }
   </div>
 </ion-content>

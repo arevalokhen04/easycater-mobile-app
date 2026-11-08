@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, LoadingController, ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 
 import { BookingService } from '../core/services/booking.service';
 import { CartService } from '../core/services/cart.service';
@@ -19,7 +19,6 @@ export class CartPage implements OnInit {
     private bookings: BookingService,
     private router: Router,
     private alert: AlertController,
-    private loading: LoadingController,
     private toast: ToastController
   ) {}
 
@@ -67,20 +66,16 @@ export class CartPage implements OnInit {
       return;
     }
 
+    // Inline button state instead of a blocking overlay - no stuck backdrops.
     this.creating.set(true);
-    const loader = await this.loading.create({ message: 'Creating your booking...' });
-    await loader.present();
-
     this.bookings.create(this.cart.state(), this.cart.totals()).subscribe({
       next: (booking) => {
         this.cart.setActiveBooking(booking);
         this.creating.set(false);
-        loader.dismiss();
         this.router.navigateByUrl('/payment');
       },
       error: (err: Error) => {
         this.creating.set(false);
-        loader.dismiss();
         this.notify(err?.message || 'Could not create the booking. Please check your details.');
       },
     });

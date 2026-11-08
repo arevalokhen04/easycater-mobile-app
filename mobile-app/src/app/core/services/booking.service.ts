@@ -44,6 +44,9 @@ interface BookingRow {
   packageId?: string;
   packageName?: string;
   packageImage?: string;
+  customer?: { _id?: string; name?: string; email?: string } | string;
+  customerName?: string;
+  customerEmail?: string;
   eventType?: string;
   eventDate?: string;
   eventTime?: string;
@@ -65,12 +68,15 @@ interface BookingRow {
 /** Backend rows use Mongo _id + populated package - normalize to the app model. */
 function mapBooking(raw: BookingRow): Booking {
   const pkg = raw.package && typeof raw.package === 'object' ? raw.package : undefined;
+  const customer = raw.customer && typeof raw.customer === 'object' ? raw.customer : undefined;
   return {
     id: (raw._id ?? raw.id) as string,
     bookingNumber: raw.bookingNumber ?? '',
     packageId: (pkg?._id ?? raw.packageId ?? '') as string,
     packageName: pkg?.name ?? raw.packageName,
     packageImage: pkg?.image ?? raw.packageImage,
+    customerName: customer?.name ?? raw.customerName,
+    customerEmail: customer?.email ?? raw.customerEmail,
     eventType: raw.eventType ?? 'other',
     eventDate: String(raw.eventDate ?? '').slice(0, 10),
     eventTime: raw.eventTime ?? '',
@@ -284,6 +290,20 @@ export class BookingService {
       };
     }
     return { allowed: true, reason: null };
+  }
+
+  /** Admin status pipeline - PUT /bookings/:id/status (backend validates). */
+  updateStatus(id: string, status: BookingStatus): Observable<Booking> {
+    if (environment.useMockData) {
+      const booking = this.bookings.find((b) => b.id === id);
+      if (!booking) return throwError(() => new Error('Booking not found'));
+      booking.status = status;
+      return of({ ...booking }).pipe(delay(300));
+    }
+
+    return this.api
+      .put<BookingRow>(`/bookings/${id}/status`, { status })
+      .pipe(map(mapBooking));
   }
 
   /** Synchronous store update (mock mode) - mirrors the backend aggregation. */

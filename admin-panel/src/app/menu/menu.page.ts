@@ -16,6 +16,8 @@ export class MenuAdminPage implements OnInit {
   readonly items = signal<AdminMenuItem[]>([]);
   readonly search = signal('');
   readonly category = signal('all');
+  readonly loading = signal(true);
+  readonly busy = signal(false);
 
   constructor(
     private data: AdminDataService,
@@ -65,9 +67,12 @@ export class MenuAdminPage implements OnInit {
                 price: Number(data['price']) || 0,
                 category: (data['category'] || 'main-course').toLowerCase(),
               })
-              .subscribe(() => {
-                this.load();
-                this.notify('Menu item created');
+              .subscribe({
+                next: () => {
+                  this.load();
+                  this.notify('Menu item created');
+                },
+                error: (err: Error) => this.notify(err.message),
               });
             return true;
           },
@@ -78,12 +83,18 @@ export class MenuAdminPage implements OnInit {
   }
 
   toggleAvailable(item: AdminMenuItem): void {
+    if (this.busy()) return;
+    this.busy.set(true);
     this.data.toggleMenuItem(item.id).subscribe({
       next: () => {
+        this.busy.set(false);
         this.load();
         this.notify(`${item.name} is now ${item.isAvailable ? 'unavailable' : 'available'}`);
       },
-      error: (err: Error) => this.notify(err.message),
+      error: (err: Error) => {
+        this.busy.set(false);
+        this.notify(err.message);
+      },
     });
   }
 
@@ -97,12 +108,18 @@ export class MenuAdminPage implements OnInit {
           text: 'Delete',
           role: 'destructive',
           handler: () => {
+            if (this.busy()) return;
+            this.busy.set(true);
             this.data.deleteMenuItem(item.id).subscribe({
               next: () => {
+                this.busy.set(false);
                 this.load();
                 this.notify('Menu item deleted');
               },
-              error: (err: Error) => this.notify(err.message),
+              error: (err: Error) => {
+                this.busy.set(false);
+                this.notify(err.message);
+              },
             });
           },
         },
@@ -112,7 +129,17 @@ export class MenuAdminPage implements OnInit {
   }
 
   private load(): void {
-    this.data.getMenu(this.search(), this.category()).subscribe((list) => this.items.set(list));
+    this.loading.set(true);
+    this.data.getMenu(this.search(), this.category()).subscribe({
+      next: (list) => {
+        this.items.set(list);
+        this.loading.set(false);
+      },
+      error: (err: Error) => {
+        this.loading.set(false);
+        this.notify(err.message);
+      },
+    });
   }
 
   private async notify(message: string): Promise<void> {

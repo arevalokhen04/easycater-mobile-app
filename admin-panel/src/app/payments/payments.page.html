@@ -45,56 +45,97 @@
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-head"><h2>Transactions</h2></div>
-      <div class="table-wrap">
-        @if (payments().length === 0) {
-          <div class="empty-row">No payments with this status.</div>
-        } @else {
-          <table class="data">
-            <thead>
-              <tr>
-                <th>Reference</th>
-                <th>Booking</th>
-                <th>Customer</th>
-                <th>Method</th>
-                <th>Amount</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (p of payments(); track p.id) {
+    <!-- Desktop: full table -->
+    <div class="table-view">
+      <div class="panel">
+        <div class="panel-head"><h2>Transactions</h2></div>
+        <div class="table-wrap">
+          @if (payments().length === 0) {
+            <div class="empty-row">No payments with this status.</div>
+          } @else {
+            <table class="data">
+              <thead>
                 <tr>
-                  <td class="mono">{{ p.referenceNumber }}</td>
-                  <td class="mono">{{ p.bookingNumber }}</td>
-                  <td class="strong">{{ p.customerName }}</td>
-                  <td>
-                    <span class="method">
-                      <ion-icon [name]="methodIcon(p.method)"></ion-icon>
-                      {{ p.method }}
-                    </span>
-                  </td>
-                  <td class="money" [class.neg]="p.amount < 0">{{ money(p.amount) }}</td>
-                  <td>{{ p.paidAt | date: 'MMM d, y' }}</td>
-                  <td><span class="tag" [ngClass]="statusClass(p.status)">{{ p.status }}</span></td>
-                  <td>
-                    @if (p.status === 'pending') {
-                      <ion-button fill="clear" size="small" (click)="verify(p)">Verify</ion-button>
-                    }
-                    @if (p.status === 'paid') {
-                      <ion-button fill="clear" size="small" color="medium" (click)="refund(p)">
-                        Refund
-                      </ion-button>
-                    }
-                  </td>
+                  <th>Reference</th>
+                  <th>Booking</th>
+                  <th>Customer</th>
+                  <th>Method</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              }
-            </tbody>
-          </table>
-        }
+              </thead>
+              <tbody>
+                @for (p of payments(); track p.id) {
+                  <tr>
+                    <td class="mono">{{ p.referenceNumber }}</td>
+                    <td class="mono">{{ p.bookingNumber }}</td>
+                    <td class="strong">{{ p.customerName }}</td>
+                    <td>
+                      <span class="method">
+                        <ion-icon [name]="methodIcon(p.method)"></ion-icon>
+                        {{ methodLabel(p.method) }}
+                      </span>
+                    </td>
+                    <td class="money" [class.neg]="p.amount < 0">{{ money(p.amount) }}</td>
+                    <td>{{ p.paidAt | date: 'MMM d, y' }}</td>
+                    <td><span class="tag" [ngClass]="statusClass(p.status)">{{ p.status }}</span></td>
+                    <td>
+                      @if (p.status === 'pending') {
+                        <ion-button fill="clear" size="small" [disabled]="busy()" (click)="verify(p)">Verify</ion-button>
+                      }
+                      @if (p.status === 'paid') {
+                        <ion-button fill="clear" size="small" color="medium" [disabled]="busy()" (click)="refund(p)">
+                          Refund
+                        </ion-button>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
       </div>
+    </div>
+
+    <!-- Mobile: payment cards with inline actions -->
+    <div class="card-view">
+      <h2 class="card-count">{{ payments().length }} transaction(s)</h2>
+      @for (p of payments(); track p.id) {
+        <div class="panel mob-card">
+          <div class="mob-card-body">
+            <div class="mob-row">
+              <h3>{{ p.customerName ?? 'Customer' }}</h3>
+              <span class="tag" [ngClass]="statusClass(p.status)">{{ p.status }}</span>
+            </div>
+            <p class="card-ref">{{ p.referenceNumber }} · {{ p.bookingNumber }}</p>
+
+            <div class="card-facts">
+              <span><ion-icon [name]="methodIcon(p.method)"></ion-icon> {{ methodLabel(p.method) }}</span>
+              @if (p.paidAt) {
+                <span><ion-icon name="time-outline"></ion-icon> {{ p.paidAt | date: 'MMM d, y' }}</span>
+              }
+            </div>
+
+            <div class="mob-row card-foot">
+              <span class="ec-badge label-only">Payment</span>
+              <strong class="money">{{ money(p.amount) }}</strong>
+            </div>
+
+            @if (p.status === 'pending') {
+              <ion-button class="block" expand="block" size="small" [disabled]="busy()" (click)="verify(p)">
+                Verify payment
+              </ion-button>
+            } @else if (p.status === 'paid') {
+              <ion-button fill="outline" color="danger" expand="block" size="small" [disabled]="busy()" (click)="refund(p)">
+                Refund
+              </ion-button>
+            }
+          </div>
+        </div>
+      }
     </div>
   </div>
 </ion-content>

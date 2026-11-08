@@ -368,3 +368,143 @@ table.data {
     color: var(--ec-muted);
   }
 }
+
+/* ---- Loading skeletons for table pages (visibility of system status) -- */
+.skeleton-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+}
+
+/* ---- Contextual hint above tables (mobile: swipe sideways) -- */
+.table-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  color: var(--ec-muted);
+
+  ion-icon {
+    font-size: 15px;
+    flex-shrink: 0;
+    color: var(--ion-color-primary);
+  }
+}
+
+@media (min-width: 992px) {
+  .table-hint {
+    display: none; // desktop tables fit without scrolling
+  }
+}
+
+/* ---- Brand logo + name inline in toolbars (same as the customer app) -- */
+.brand-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.01em;
+  font-size: 1.05rem;
+
+  img {
+    height: 26px;
+    width: auto;
+    display: block;
+  }
+}
+
+/* ---- Responsive table/card views (mobile cards, desktop tables) -- */
+.card-view {
+  display: none;
+}
+
+@media (max-width: 991px) {
+  .table-view {
+    display: none;
+  }
+
+  .card-view {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .card-ref {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.74rem;
+    color: var(--ec-muted);
+  }
+
+  .card-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      color: var(--ec-ink);
+    }
+
+    ion-icon {
+      font-size: 14px;
+      color: var(--ion-color-primary);
+    }
+  }
+
+  .card-venue {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: var(--ec-muted);
+
+    ion-icon {
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+  }
+
+  .card-foot {
+    margin-top: 2px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f4;
+  }
+}
+
+/* ---- Mobile card styles for the responsive admin views -- */
+.mob-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mob-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ec-ink);
+  }
+}
+
+.mob-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.card-count {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ec-ink);
+}

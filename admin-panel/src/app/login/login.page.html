@@ -1,20 +1,15 @@
-<ion-content class="ion-no-padding">
-  <div class="wrap">
-    <div class="side">
-      <div class="side-inner">
-        <div class="logo">
-          <ion-icon name="restaurant"></ion-icon>
-        </div>
-        <h1>EasyCater Admin</h1>
-        <p>Manage packages, menus, bookings, payments and reports from one place.</p>
+<ion-content [fullscreen]="true">
+  <div class="auth">
+    <div class="brand">
+      <div class="logo">
+        <img src="assets/easycater-logo-orange.png" alt="EasyCater Admin logo" />
       </div>
+      <h1>EasyCater Admin</h1>
+      <p>Administrator console - track bookings and orders.</p>
     </div>
 
-    <div class="form-side">
-      <form class="form" (ngSubmit)="submit()">
-        <h2>Sign in</h2>
-        <p class="sub">Use your administrator account to continue.</p>
-
+    <div class="form">
+      <form (ngSubmit)="submit()">
         @if (error(); as message) {
           <div class="error">
             <ion-icon name="alert-circle-outline"></ion-icon>
@@ -63,6 +58,10 @@
         <ion-button fill="clear" size="small" type="button" (click)="fillDemo()">
           Use demo credentials
         </ion-button>
+
+        <div class="alt">
+          <span>Customers book through the EasyCater app.</span>
+        </div>
       </form>
     </div>
   </div>

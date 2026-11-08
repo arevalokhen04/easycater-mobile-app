@@ -1,6 +1,5 @@
 import { Component, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LoadingController } from '@ionic/angular';
 
 import { AuthService } from '../core/services/auth.service';
 
@@ -16,7 +15,7 @@ export class LoginPage {
   readonly showPassword = signal(false);
   readonly error = signal('');
 
-  /** Guards against a double-tap stacking two loading overlays. */
+  /** Inline button state - no blocking overlay, no stuck backdrops. */
   readonly busy = signal(false);
 
   private redirect = '/dashboard';
@@ -24,8 +23,7 @@ export class LoginPage {
   constructor(
     private auth: AuthService,
     private router: Router,
-    private route: ActivatedRoute,
-    private loading: LoadingController
+    private route: ActivatedRoute
   ) {
     this.redirect = this.route.snapshot.queryParamMap.get('redirect') ?? '/dashboard';
   }
@@ -39,16 +37,12 @@ export class LoginPage {
     }
 
     this.busy.set(true);
-    const loader = await this.loading.create({ message: 'Signing in...' });
-    await loader.present();
-
     this.auth.login(this.email().trim(), this.password()).subscribe({
       next: () => {
-        loader.dismiss();
+        this.busy.set(false);
         this.router.navigateByUrl(this.redirect, { replaceUrl: true });
       },
       error: (err: Error) => {
-        loader.dismiss();
         this.busy.set(false);
         this.error.set(err.message);
       },

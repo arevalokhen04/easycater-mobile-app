@@ -21,3 +21,31 @@
     color: #fff;
   }
 }
+
+/* Mobile card view */
+.card-count {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ec-ink);
+}
+
+.mob-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mob-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ec-ink);
+  }
+}

@@ -1,6 +1,6 @@
-﻿import { Component, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AlertController, LoadingController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 
 import { AuthService } from '../core/services/auth.service';
 
@@ -13,6 +13,7 @@ import { AuthService } from '../core/services/auth.service';
 export class LoginPage {
   readonly email = signal('');
   readonly password = signal('');
+  readonly busy = signal(false);
   showPassword = false;
 
   private redirect = '/tabs/home';
@@ -21,28 +22,36 @@ export class LoginPage {
     private auth: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private loading: LoadingController,
     private alert: AlertController
   ) {
     this.redirect = this.route.snapshot.queryParamMap.get('redirect') ?? '/tabs/home';
   }
 
   async submit(): Promise<void> {
+    if (this.busy()) return;
     if (!this.email().trim() || !this.password()) {
       await this.showAlert('Please fill in both fields', 'Missing details');
       return;
     }
 
-    const loader = await this.loading.create({ message: 'Signing in...' });
-    await loader.present();
-
+    // Inline button state instead of a blocking overlay - no stuck backdrops.
+    this.busy.set(true);
     this.auth.login(this.email().trim(), this.password()).subscribe({
-      next: () => {
-        loader.dismiss();
+      next: (res) => {
+        this.busy.set(false);
+        // This app is customers-only - admin accounts belong to the Admin app.
+        if (res.user.role === 'admin') {
+          this.auth.logout();
+          this.showAlert(
+            'This account is an admin. Please use the EasyCater Admin app to manage bookings.',
+            'Admin account'
+          );
+          return;
+        }
         this.router.navigateByUrl(this.redirect, { replaceUrl: true });
       },
       error: (err: Error) => {
-        loader.dismiss();
+        this.busy.set(false);
         this.showAlert(err.message, 'Login failed');
       },
     });
@@ -59,6 +68,3 @@ export class LoginPage {
     await alert.present();
   }
 }
-
-
-

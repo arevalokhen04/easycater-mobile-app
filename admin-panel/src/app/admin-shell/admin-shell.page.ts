@@ -22,6 +22,15 @@ export class AdminShellPage {
     { path: '/reports', label: 'Reports', icon: 'bar-chart-outline' },
   ];
 
+  /** Bottom tab bar (phones/tablets) - the four most-used screens. */
+  readonly tabLinks = [
+    { path: '/dashboard', label: 'Home', icon: 'grid-outline' },
+    { path: '/bookings', label: 'Bookings', icon: 'calendar-outline' },
+    { path: '/payments', label: 'Payments', icon: 'card-outline' },
+    { path: '/customers', label: 'Customers', icon: 'people-outline' },
+    { path: '/reports', label: 'Reports', icon: 'bar-chart-outline' },
+  ];
+
   constructor(public auth: AuthService) {}
 
   get adminName(): string {
