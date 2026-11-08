@@ -44,14 +44,12 @@
             <table class="data">
               <thead>
                 <tr>
-                  <th>Reference</th>
                   <th>Customer</th>
                   <th>Package</th>
                   <th>Event</th>
-                  <th>Guests</th>
+                  <th class="keep">Guests</th>
                   <th>Venue</th>
                   <th>Total</th>
-                  <th>Payment</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -59,7 +57,6 @@
               <tbody>
                 @for (b of bookings(); track b.id) {
                   <tr>
-                    <td class="mono">{{ b.bookingNumber }}</td>
                     <td>
                       <div class="cell-user">
                         <div class="mini-avatar">{{ initials(b.customerName) }}</div>
@@ -69,20 +66,23 @@
                         </div>
                       </div>
                     </td>
-                    <td class="wrap">{{ b.packageName }}</td>
-                    <td>
+                    <td class="wrap">
+                      {{ b.packageName }}
+                      <small class="mono" style="display: block">{{ b.bookingNumber }}</small>
+                    </td>
+                    <td class="keep">
                       {{ b.eventDate | date: 'MMM d, y' }}
                       <small class="mono" style="display: block">{{ b.eventTime }}</small>
                     </td>
-                    <td>{{ b.guestCount }}</td>
+                    <td class="keep">{{ b.guestCount }}</td>
                     <td class="wrap">{{ b.venue }}</td>
                     <td class="money">{{ money(b.total) }}</td>
                     <td>
                       <span class="tag" [ngClass]="b.paymentStatus === 'paid' ? 'ok' : 'wait'">
                         {{ b.paymentStatus }}
                       </span>
+                      <span class="tag" [ngClass]="statusClass(b.status)" style="margin-top: 4px; margin-left: 4px">{{ b.status }}</span>
                     </td>
-                    <td><span class="tag" [ngClass]="statusClass(b.status)">{{ b.status }}</span></td>
                     <td>
                       @if (nextStatus(b.status); as next) {
                         <ion-button fill="clear" size="small" [disabled]="busy()" (click)="updateStatus(b, next)">
