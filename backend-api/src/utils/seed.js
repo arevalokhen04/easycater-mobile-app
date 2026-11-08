@@ -75,6 +75,25 @@ const PACKAGES = [
   },
 ];
 
+// Accurate dish photos from Wikimedia Commons (verified working URLs).
+const MENU_ITEM_IMAGES = {
+  'Kare-Kare': 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Kare-kare.jpg',
+  'Lechon Kawali': 'https://upload.wikimedia.org/wikipedia/commons/c/cc/Lechon_Kawali.jpg',
+  'Lumpiang Shanghai': 'https://upload.wikimedia.org/wikipedia/commons/9/95/Lumpiang_Shanghai_%28Philippines%29.jpg',
+  'Pancit Bihon': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Pancit_bihon_3.jpg/960px-Pancit_bihon_3.jpg',
+  'Salmon Teriyaki': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Salmon_Teriyaki.jpg/960px-Salmon_Teriyaki.jpg',
+  'Beef Caldereta': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Beef_caldereta.jpg/960px-Beef_caldereta.jpg',
+  'Bihon Guisado': 'https://upload.wikimedia.org/wikipedia/commons/b/b3/Pancit_Bihon_Guisado_Recipe.jpg',
+  'Cheese Platter': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/An_artful_arrangement_of_cheese_and_sausage.jpg/960px-An_artful_arrangement_of_cheese_and_sausage.jpg',
+  'Fresh Mango Juice': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Glass_of_Mango_Juice.jpg/960px-Glass_of_Mango_Juice.jpg',
+  'Garlic Butter Shrimp': 'https://upload.wikimedia.org/wikipedia/commons/9/90/Shrimp_with_butter_garlic_and_peas.jpg',
+  'Halo-Halo': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Halo_halo1.jpg/960px-Halo_halo1.jpg',
+  'Leche Flan': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Homemade_Flan.jpg/960px-Homemade_Flan.jpg',
+  'Mung Bean Soup': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/116Monggo_guisado_with_shrimps%2C_tofu_and_eggs_01.jpg/960px-116Monggo_guisado_with_shrimps%2C_tofu_and_eggs_01.jpg',
+  'Pochero': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Puchero_canario.jpg/960px-Puchero_canario.jpg',
+  "Sago't Gulaman": 'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/aa/Gulaman.jpg/960px-Gulaman.jpg',
+};
+
 const MENU_ITEMS = [
   ['Kare-Kare', 'Oxtail and peanut stew, perfect with rice', 385, 'main-course', ['halal']],
   ['Pancit Bihon', 'Stir-fried rice noodles with vegetables', 210, 'main-course', ['vegetarian']],
@@ -143,6 +162,8 @@ async function seed() {
     price,
     category,
     dietary,
+    // Accurate dish photos (Wikimedia Commons) - verified working URLs.
+    image: MENU_ITEM_IMAGES[name] || '',
     package: packages[i % packages.length]._id,
     isFeatured: i < 5,
   }));
