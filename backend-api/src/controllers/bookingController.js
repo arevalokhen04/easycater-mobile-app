@@ -208,7 +208,17 @@ const updateStatus = asyncHandler(async (req, res) => {
   if (!booking) throw ApiError.notFound('Booking not found');
 
   const { status, notes } = req.body;
-  if (status) booking.status = status;
+  if (status) {
+    // Payment gating: work starts only after a downpayment, and an event can
+    // be completed only once the balance is fully settled.
+    if (status !== 'cancelled' && booking.paymentStatus === 'unpaid') {
+      throw ApiError.badRequest('This booking has no payment yet - collect the downpayment first.');
+    }
+    if (status === 'completed' && booking.paymentStatus !== 'paid') {
+      throw ApiError.badRequest('The remaining balance must be paid before completing this booking.');
+    }
+    booking.status = status;
+  }
   if (notes !== undefined) booking.notes = notes;
   await booking.save();
 

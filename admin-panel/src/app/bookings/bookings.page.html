@@ -85,9 +85,15 @@
                     </td>
                     <td>
                       @if (nextStatus(b.status); as next) {
-                        <ion-button fill="clear" size="small" [disabled]="busy()" (click)="updateStatus(b, next)">
-                          &rarr; {{ next }}
-                        </ion-button>
+                        @if (b.paymentStatus === 'unpaid') {
+                          <span class="tag grey">needs payment</span>
+                        } @else if (next === 'completed' && b.paymentStatus !== 'paid') {
+                          <span class="tag wait">balance due</span>
+                        } @else {
+                          <ion-button fill="clear" size="small" [disabled]="busy()" (click)="updateStatus(b, next)">
+                            &rarr; {{ next }}
+                          </ion-button>
+                        }
                       }
                     </td>
                   </tr>
@@ -128,9 +134,21 @@
               </div>
 
               @if (nextStatus(b.status); as next) {
-                <ion-button class="block" expand="block" size="small" [disabled]="busy()" (click)="updateStatus(b, next)">
-                  &rarr; Move to {{ next }}
-                </ion-button>
+                @if (b.paymentStatus === 'unpaid') {
+                  <div class="card-venue">
+                    <ion-icon name="cash-outline"></ion-icon>
+                    Needs payment - collect the downpayment first
+                  </div>
+                } @else if (next === 'completed' && b.paymentStatus !== 'paid') {
+                  <div class="card-venue">
+                    <ion-icon name="cash-outline"></ion-icon>
+                    Balance due - collect the remaining payment
+                  </div>
+                } @else {
+                  <ion-button class="block" expand="block" size="small" [disabled]="busy()" (click)="updateStatus(b, next)">
+                    &rarr; Move to {{ next }}
+                  </ion-button>
+                }
               }
             </div>
           </div>

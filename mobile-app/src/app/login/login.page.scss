@@ -12,21 +12,31 @@
 }
 
 .logo {
-  width: 68px;
-  height: 68px;
   margin: 0 auto 14px;
-  display: grid;
-  place-items: center;
-  border-radius: 20px;
-  background: linear-gradient(140deg, var(--ion-color-primary), var(--ion-color-primary-tint));
-  color: #fff;
-  box-shadow: 0 8px 20px rgba(242, 118, 13, 0.32);
+  display: flex;
+  justify-content: center;
 
   img {
-    width: 40px;
-    height: 40px;
+    width: 190px;
     object-fit: contain;
     display: block;
+  }
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(var(--ion-color-danger-rgb), 0.1);
+  color: var(--ion-color-danger-shade);
+  font-size: 0.84rem;
+
+  ion-icon {
+    font-size: 17px;
+    flex-shrink: 0;
   }
 }
 
