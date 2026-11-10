@@ -16,9 +16,34 @@ const publicUser = (user) => ({
   createdAt: user.createdAt,
 });
 
+// New accounts may only use letters, numbers and the special characters
+// @ and - (plus structural ones: dots in emails, spaces in names, + in
+// phone numbers). Anything else is rejected.
+const CHAR_RULES = {
+  name: /^[A-Za-z\s@-]+$/,
+  email: /^[A-Za-z0-9@.-]+$/,
+  password: /^[A-Za-z0-9@-]+$/,
+  phone: /^[0-9+\- ]*$/,
+};
+
+const checkChars = (fields) => {
+  const bad = [];
+  for (const [field, value] of Object.entries(fields)) {
+    if (value && !CHAR_RULES[field].test(String(value))) bad.push(field);
+  }
+  return bad;
+};
+
 /** POST /api/v1/auth/register */
 const register = asyncHandler(async (req, res) => {
   const { name, email, password, phone, address } = req.body;
+
+  const badFields = checkChars({ name, email, password, phone });
+  if (badFields.length) {
+    throw ApiError.badRequest(
+      `Only letters, numbers and the special characters @ and - are allowed (problem: ${badFields.join(', ')})`
+    );
+  }
 
   if (await User.exists({ email: email.toLowerCase() })) {
     throw ApiError.conflict('Email is already registered');
@@ -64,6 +89,13 @@ const updateProfile = asyncHandler(async (req, res) => {
   allowed.forEach((key) => {
     if (req.body[key] !== undefined) payload[key] = req.body[key];
   });
+
+  const badFields = checkChars({ name: payload.name, phone: payload.phone });
+  if (badFields.length) {
+    throw ApiError.badRequest(
+      `Only letters, numbers and the special characters @ and - are allowed (problem: ${badFields.join(', ')})`
+    );
+  }
 
   const user = await User.findByIdAndUpdate(req.user._id, { $set: payload }, {
     new: true,

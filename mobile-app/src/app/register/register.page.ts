@@ -44,6 +44,24 @@ export class RegisterPage {
       await this.show('Passwords do not match', 'Check your input');
       return;
     }
+    // Character policy: letters and numbers plus @ - only (structural
+    // characters like dots in emails and + in phone numbers are fine).
+    if (!/^[A-Za-z\s@-]+$/.test(this.name().trim())) {
+      await this.show('The name can only use letters, spaces, @ and -', 'Invalid characters');
+      return;
+    }
+    if (!/^[A-Za-z0-9@.-]+$/.test(this.email().trim())) {
+      await this.show('The email can only use letters, numbers, dots, @ and -', 'Invalid characters');
+      return;
+    }
+    if (!/^[0-9+\- ]*$/.test(this.phone().trim())) {
+      await this.show('The phone number can only use numbers, +, - and spaces', 'Invalid characters');
+      return;
+    }
+    if (!/^[A-Za-z0-9@-]+$/.test(this.password())) {
+      await this.show('The password can only use letters, numbers, @ and -', 'Invalid characters');
+      return;
+    }
     if (!this.agreed) {
       await this.show('Please accept the terms and conditions', 'Almost there');
       return;
