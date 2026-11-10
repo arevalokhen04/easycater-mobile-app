@@ -277,6 +277,27 @@ table.data {
 .tag.soon { background: var(--ion-color-primary); }
 .tag.grey { background: #9ca3af; }
 
+/* ------------------------------------------------- Status cell lines -- */
+/* Payment + booking status shown as labeled rows; the fixed-width label
+   keeps every tag aligned in a clean vertical column across all rows.   */
+
+.status-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+}
+
+.status-label {
+  width: 56px;
+  flex-shrink: 0;
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ec-muted);
+}
+
 /* -------------------------------------------------------- Filter chips -- */
 /* Segmented control: one rounded track, active segment is solid orange.   */
 

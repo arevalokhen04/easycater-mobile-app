@@ -78,10 +78,14 @@
                     <td class="wrap">{{ b.venue }}</td>
                     <td class="money">{{ money(b.total) }}</td>
                     <td>
-                      <span class="tag" [ngClass]="b.paymentStatus === 'paid' ? 'ok' : 'wait'">
-                        {{ b.paymentStatus }}
-                      </span>
-                      <span class="tag" [ngClass]="statusClass(b.status)" style="margin-top: 4px; margin-left: 4px">{{ b.status }}</span>
+                      <div class="status-line">
+                        <span class="status-label">Payment</span>
+                        <span class="tag" [ngClass]="b.paymentStatus === 'paid' ? 'ok' : 'wait'">{{ b.paymentStatus }}</span>
+                      </div>
+                      <div class="status-line">
+                        <span class="status-label">Status</span>
+                        <span class="tag" [ngClass]="statusClass(b.status)">{{ b.status }}</span>
+                      </div>
                     </td>
                     <td>
                       @if (nextStatus(b.status); as next) {
