@@ -46,7 +46,7 @@
     <ion-item class="ec-field" lines="none">
       <ion-label position="stacked">Password</ion-label>
       <ion-input
-        [type]="showPassword ? 'text' : 'password'"
+        [type]="showPassword() ? 'text' : 'password'"
         placeholder="At least 8 characters"
         [ngModel]="password()"
         (ngModelChange)="password.set($event)"
@@ -56,17 +56,17 @@
         fill="clear"
         slot="end"
         type="button"
-        (click)="showPassword = !showPassword"
-        [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+        (click)="togglePassword()"
+        [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
       >
-        <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+        <ion-icon slot="icon-only" [name]="showPassword() ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
       </ion-button>
     </ion-item>
 
     <ion-item class="ec-field" lines="none">
       <ion-label position="stacked">Confirm password</ion-label>
       <ion-input
-        [type]="showPassword ? 'text' : 'password'"
+        [type]="showPassword() ? 'text' : 'password'"
         placeholder="Re-enter your password"
         [ngModel]="confirmPassword()"
         (ngModelChange)="confirmPassword.set($event)"

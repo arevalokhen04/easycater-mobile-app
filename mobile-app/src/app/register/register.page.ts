@@ -17,8 +17,12 @@ export class RegisterPage {
   readonly password = signal('');
   readonly confirmPassword = signal('');
   readonly busy = signal(false);
-  showPassword = false;
+  readonly showPassword = signal(false);
   agreed = false;
+
+  togglePassword(): void {
+    this.showPassword.update((v) => !v);
+  }
 
   constructor(
     private auth: AuthService,

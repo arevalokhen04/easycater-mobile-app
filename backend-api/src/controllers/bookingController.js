@@ -147,15 +147,17 @@ const create = asyncHandler(async (req, res) => {
     );
   }
 
-  // One event per day - a date with an active booking is fully booked.
-  // Range match: stored dates may carry a time component (seed data).
+  // One event per day - a date with a live booking is fully booked.
+  // Matches the taken-dates rule: cancelled events freed the date, and
+  // completed events are finished. Range match: stored dates may carry a
+  // time component (seed data).
   const dayStart = new Date(requested);
   dayStart.setUTCHours(0, 0, 0, 0);
   const dayEnd = new Date(dayStart);
   dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
   const clash = await Booking.findOne({
     eventDate: { $gte: dayStart, $lt: dayEnd },
-    status: { $ne: 'cancelled' },
+    status: { $nin: ['cancelled', 'completed'] },
   });
   if (clash) {
     throw ApiError.badRequest('That date is already fully booked - please choose another date');
