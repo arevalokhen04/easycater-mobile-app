@@ -49,7 +49,9 @@ function mapAdminBooking(raw: Row): AdminBooking {
     ...(raw as unknown as AdminBooking),
     id: rowId(raw),
     customerName:
-      typeof customer === 'object' ? (customer?.name ?? '—') : ((raw.customerName as string) ?? '—'),
+      typeof customer === 'object'
+        ? (customer?.name ?? 'Deleted account')
+        : ((raw.customerName as string) ?? 'Deleted account'),
     customerEmail:
       typeof customer === 'object' ? (customer?.email ?? '') : ((raw.customerEmail as string) ?? ''),
     packageName: typeof pkg === 'object' ? (pkg?.name ?? '—') : ((raw.packageName as string) ?? '—'),
@@ -65,7 +67,10 @@ function mapAdminPayment(raw: Row): AdminPayment {
     id: rowId(raw),
     bookingNumber:
       typeof booking === 'object' ? (booking?.bookingNumber ?? '—') : ((raw.bookingNumber as string) ?? '—'),
-    customerName: typeof user === 'object' ? (user?.name ?? '—') : ((raw.customerName as string) ?? '—'),
+    customerName:
+      typeof user === 'object'
+        ? (user?.name ?? 'Deleted account')
+        : ((raw.customerName as string) ?? 'Deleted account'),
     paidAt: (raw.paidAt as string) ?? '',
   };
 }
