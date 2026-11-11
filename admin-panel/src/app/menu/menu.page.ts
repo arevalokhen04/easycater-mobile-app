@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { AlertController, ToastController } from '@ionic/angular';
 
 import { AdminDataService } from '../core/services/admin-data.service';
@@ -18,6 +18,18 @@ export class MenuAdminPage implements OnInit {
   readonly category = signal('all');
   readonly loading = signal(true);
   readonly busy = signal(false);
+
+  /** Filter chips skip the "all" entry for the create form's dropdown. */
+  readonly categoryChoices = this.categories.filter((c) => c !== 'all');
+
+  // ---- create-menu-item modal state ----
+  readonly createOpen = signal(false);
+  readonly cName = signal('');
+  readonly cPrice = signal('');
+  readonly cCategory = signal('main-course');
+  readonly cImageUrl = signal('');
+  readonly cPhoto = signal('');
+  readonly cPreview = computed(() => this.cPhoto() || this.cImageUrl().trim());
 
   constructor(
     private data: AdminDataService,
@@ -43,43 +55,63 @@ export class MenuAdminPage implements OnInit {
     this.load();
   }
 
-  async createItem(): Promise<void> {
-    const alert = await this.alert.create({
-      header: 'New menu item',
-      inputs: [
-        { name: 'name', placeholder: 'Dish name', type: 'text' },
-        { name: 'price', placeholder: 'Price', type: 'number' },
-        {
-          name: 'category',
-          placeholder: 'appetizer | main-course | sides | dessert | drinks',
-          type: 'text',
+  /** Opens the create modal with fresh fields (photo included). */
+  openCreate(): void {
+    this.cName.set('');
+    this.cPrice.set('');
+    this.cCategory.set('main-course');
+    this.cImageUrl.set('');
+    this.cPhoto.set('');
+    this.createOpen.set(true);
+  }
+
+  closeCreate(): void {
+    this.createOpen.set(false);
+  }
+
+  /** Reads the picked photo into a data URL for the preview and payload. */
+  onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files && input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => this.cPhoto.set(String(reader.result || ''));
+    reader.readAsDataURL(file);
+  }
+
+  async confirmCreate(): Promise<void> {
+    if (this.busy()) return;
+    const name = this.cName().trim();
+    const price = Number(this.cPrice());
+    if (!name) {
+      this.notify('Enter the dish name first');
+      return;
+    }
+    if (!price || price <= 0) {
+      this.notify('Enter a price above PHP 0');
+      return;
+    }
+    const image = this.cPhoto() || this.cImageUrl().trim();
+    this.busy.set(true);
+    this.data
+      .saveMenuItem({
+        name,
+        price,
+        category: this.cCategory(),
+        image,
+      })
+      .subscribe({
+        next: () => {
+          this.busy.set(false);
+          this.closeCreate();
+          this.load();
+          this.notify('Menu item created');
         },
-      ],
-      buttons: [
-        { text: 'Cancel', role: 'cancel' },
-        {
-          text: 'Create',
-          handler: (data: Record<string, string>) => {
-            if (!data['name']?.trim()) return false;
-            this.data
-              .saveMenuItem({
-                name: data['name'].trim(),
-                price: Number(data['price']) || 0,
-                category: (data['category'] || 'main-course').toLowerCase(),
-              })
-              .subscribe({
-                next: () => {
-                  this.load();
-                  this.notify('Menu item created');
-                },
-                error: (err: Error) => this.notify(err.message),
-              });
-            return true;
-          },
+        error: (err: Error) => {
+          this.busy.set(false);
+          this.notify(err.message);
         },
-      ],
-    });
-    await alert.present();
+      });
   }
 
   toggleAvailable(item: AdminMenuItem): void {

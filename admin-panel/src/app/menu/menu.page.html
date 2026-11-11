@@ -5,7 +5,7 @@
     </ion-buttons>
     <ion-title>Menu</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="createItem()">
+      <ion-button (click)="openCreate()">
         <ion-icon slot="start" name="add"></ion-icon>
         New
       </ion-button>
@@ -130,3 +130,80 @@
     }
   </div>
 </ion-content>
+
+<!-- Create-menu-item modal: dish, price, category and photo. -->
+<ion-modal [isOpen]="createOpen()" (didDismiss)="closeCreate()">
+  <ng-template>
+    <div class="create-card">
+      <h2>New menu item</h2>
+
+      <ion-item class="ec-field" lines="none">
+        <ion-label position="stacked">Dish name</ion-label>
+        <ion-input
+          placeholder="e.g. Crispy Pata"
+          [ngModel]="cName()"
+          (ngModelChange)="cName.set($event)"
+          name="cName"
+        ></ion-input>
+      </ion-item>
+
+      <div class="row2">
+        <ion-item class="ec-field" lines="none">
+          <ion-label position="stacked">Price (PHP)</ion-label>
+          <ion-input
+            type="number"
+            min="1"
+            placeholder="385"
+            [ngModel]="cPrice()"
+            (ngModelChange)="cPrice.set($event)"
+            name="cPrice"
+          ></ion-input>
+        </ion-item>
+        <ion-item class="ec-field" lines="none">
+          <ion-label position="stacked">Category</ion-label>
+          <ion-select
+            interface="popover"
+            [ngModel]="cCategory()"
+            (ngModelChange)="cCategory.set($event)"
+            name="cCategory"
+          >
+            @for (c of categoryChoices; track c) {
+              <ion-select-option [value]="c">{{ c | titlecase }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+      </div>
+
+      <ion-item class="ec-field" lines="none">
+        <ion-label position="stacked">Insert photo</ion-label>
+        <input
+          type="file"
+          accept="image/*"
+          class="photo-input"
+          (change)="onPhotoSelected($event)"
+        />
+      </ion-item>
+
+      <ion-item class="ec-field" lines="none">
+        <ion-label position="stacked">or paste an image URL</ion-label>
+        <ion-input
+          placeholder="https://..."
+          [ngModel]="cImageUrl()"
+          (ngModelChange)="cImageUrl.set($event)"
+          name="cImageUrl"
+        ></ion-input>
+      </ion-item>
+
+      @if (cPreview(); as src) {
+        <img [src]="src" alt="Dish preview" class="photo-preview" />
+      }
+
+      <ion-button expand="block" [disabled]="busy()" (click)="confirmCreate()">
+        {{ busy() ? 'Creating...' : 'Create menu item' }}
+      </ion-button>
+      <ion-button expand="block" fill="clear" color="medium" (click)="closeCreate()">
+        Cancel
+      </ion-button>
+    </div>
+  </ng-template>
+</ion-modal>
