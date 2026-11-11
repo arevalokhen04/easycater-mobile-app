@@ -18,6 +18,7 @@ export interface AdminPackage {
   minGuests: number;
   maxGuests: number;
   image: string;
+  rating?: number;
   isActive: boolean;
   isPopular: boolean;
   bookedCount: number;

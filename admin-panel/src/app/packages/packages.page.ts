@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { AlertController, ToastController } from '@ionic/angular';
 
 import { AdminDataService } from '../core/services/admin-data.service';
@@ -26,6 +26,16 @@ export class PackagesAdminPage implements OnInit {
     { value: 'other', label: 'Other' },
   ];
 
+  // ---- create-package modal state ----
+  readonly createOpen = signal(false);
+  readonly cName = signal('');
+  readonly cPrice = signal('');
+  readonly cCategory = signal('wedding');
+  readonly cImageUrl = signal('');
+  readonly cPhoto = signal('');
+  readonly cRating = signal('4.5');
+  readonly cPreview = computed(() => this.cPhoto() || this.cImageUrl().trim());
+
   constructor(
     private data: AdminDataService,
     private alert: AlertController,
@@ -45,61 +55,66 @@ export class PackagesAdminPage implements OnInit {
     this.load();
   }
 
-  async createPackage(): Promise<void> {
-    const alert = await this.alert.create({
-      header: 'New package',
-      message: 'Pick a category, then set the name and price per head.',
-      inputs: [
-        { name: 'name', placeholder: 'Package name', type: 'text' },
-        { name: 'price', placeholder: 'Price per head (PHP)', type: 'number', min: 1 },
-        ...this.categoryChoices.map((c, i) => ({
-          name: 'category',
-          type: 'radio' as const,
-          label: c.label,
-          value: c.value,
-          checked: i === 0,
-        })),
-      ],
-      buttons: [
-        { text: 'Cancel', role: 'cancel' },
-        {
-          text: 'Create',
-          handler: (data: Record<string, string>) => {
-            const name = data['name']?.trim();
-            const price = Number(data['price']);
-            // Error prevention: validate before anything is saved.
-            if (!name) {
-              this.notify('Enter the package name first');
-              return false;
-            }
-            if (!price || price <= 0) {
-              this.notify('Enter a price above PHP 0');
-              return false;
-            }
-            this.busy.set(true);
-            this.data
-              .savePackage({
-                name,
-                pricePerHead: price,
-                category: data['category'] || 'other',
-              })
-              .subscribe({
-                next: () => {
-                  this.busy.set(false);
-                  this.load();
-                  this.notify('Package created');
-                },
-                error: (err: Error) => {
-                  this.busy.set(false);
-                  this.notify(err.message);
-                },
-              });
-            return true;
-          },
+  /** Opens the create modal with fresh fields (photo + rating included). */
+  openCreate(): void {
+    this.cName.set('');
+    this.cPrice.set('');
+    this.cCategory.set('wedding');
+    this.cImageUrl.set('');
+    this.cPhoto.set('');
+    this.cRating.set('4.5');
+    this.createOpen.set(true);
+  }
+
+  closeCreate(): void {
+    this.createOpen.set(false);
+  }
+
+  /** Reads the picked photo into a data URL for the preview and payload. */
+  onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files && input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => this.cPhoto.set(String(reader.result || ''));
+    reader.readAsDataURL(file);
+  }
+
+  async confirmCreate(): Promise<void> {
+    if (this.busy()) return;
+    const name = this.cName().trim();
+    const price = Number(this.cPrice());
+    const rating = Math.min(5, Math.max(0, Number(this.cRating()) || 0));
+    if (!name) {
+      this.notify('Enter the package name first');
+      return;
+    }
+    if (!price || price <= 0) {
+      this.notify('Enter a price above PHP 0');
+      return;
+    }
+    const image = this.cPhoto() || this.cImageUrl().trim();
+    this.busy.set(true);
+    this.data
+      .savePackage({
+        name,
+        pricePerHead: price,
+        category: this.cCategory(),
+        image,
+        rating,
+      })
+      .subscribe({
+        next: () => {
+          this.busy.set(false);
+          this.closeCreate();
+          this.load();
+          this.notify('Package created');
         },
-      ],
-    });
-    await alert.present();
+        error: (err: Error) => {
+          this.busy.set(false);
+          this.notify(err.message);
+        },
+      });
   }
 
   toggleActive(pkg: AdminPackage): void {
