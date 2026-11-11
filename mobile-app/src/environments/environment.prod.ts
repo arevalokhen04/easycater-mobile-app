@@ -11,7 +11,7 @@ export const environment = {
    * subnet ever changes, run `ipconfig` and update this IP, then rebuild.
    * (Fallback: USB + `adb reverse tcp:4000 tcp:4000` with localhost here.)
    */
-  apiUrl: 'http://10.195.198.195:4000/api/v1',
+  apiUrl: 'http://10.14.23.131:4000/api/v1',
 
   /** Mock fixtures are development-only; production always talks to the API. */
   useMockData: false,
