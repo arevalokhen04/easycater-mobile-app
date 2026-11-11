@@ -106,8 +106,8 @@ export class ProfilePage implements OnInit {
       header: 'Log out?',
       message: 'You will need to sign in again to view your bookings.',
       buttons: [
-        { text: 'Stay', role: 'cancel' },
-        { text: 'Log out', role: 'destructive', handler: () => this.auth.logout() },
+        { text: 'Cancel', role: 'cancel' },
+        { text: 'Logout', role: 'destructive', handler: () => this.auth.logout() },
       ],
     });
     await alert.present();
