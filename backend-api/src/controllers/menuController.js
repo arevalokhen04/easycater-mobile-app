@@ -1,6 +1,7 @@
 const MenuItem = require('../models/MenuItem');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
+const { absoluteUrl, saveDataImage } = require('../utils/images');
 
 /** GET /api/v1/menu */
 const list = asyncHandler(async (req, res) => {
@@ -21,6 +22,10 @@ const list = asyncHandler(async (req, res) => {
       .limit(Number(limit)),
     MenuItem.countDocuments(filter),
   ]);
+
+  items.forEach((item) => {
+    item.image = absoluteUrl(req, item.image);
+  });
 
   res.json({
     success: true,
@@ -43,22 +48,31 @@ const categories = asyncHandler(async (_req, res) => {
 const getOne = asyncHandler(async (req, res) => {
   const item = await MenuItem.findById(req.params.id).populate('package', 'name slug');
   if (!item) throw ApiError.notFound('Menu item not found');
+  item.image = absoluteUrl(req, item.image);
   res.json({ success: true, data: item });
 });
 
 /** POST /api/v1/menu  (admin) */
 const create = asyncHandler(async (req, res) => {
+  if (req.body.image && req.body.image.startsWith('data:')) {
+    req.body.image = saveDataImage('menu', req.body.image);
+  }
   const item = await MenuItem.create(req.body);
+  item.image = absoluteUrl(req, item.image);
   res.status(201).json({ success: true, data: item });
 });
 
 /** PUT /api/v1/menu/:id  (admin) */
 const update = asyncHandler(async (req, res) => {
+  if (req.body.image && req.body.image.startsWith('data:')) {
+    req.body.image = saveDataImage('menu', req.body.image);
+  }
   const item = await MenuItem.findByIdAndUpdate(req.params.id, { $set: req.body }, {
     new: true,
     runValidators: true,
   });
   if (!item) throw ApiError.notFound('Menu item not found');
+  item.image = absoluteUrl(req, item.image);
   res.json({ success: true, data: item });
 });
 

@@ -4,6 +4,7 @@ const Booking = require('../models/Booking');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const slugify = require('../utils/slugify');
+const { absoluteUrl, saveDataImage } = require('../utils/images');
 
 /** GET /api/v1/packages */
 const list = asyncHandler(async (req, res) => {
@@ -40,7 +41,11 @@ const list = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    data: items.map((p) => ({ ...p.toObject(), bookedCount: booked.get(String(p._id)) || 0 })),
+    data: items.map((p) => ({
+      ...p.toObject(),
+      image: absoluteUrl(req, p.image),
+      bookedCount: booked.get(String(p._id)) || 0,
+    })),
     meta: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) },
   });
 });
@@ -54,13 +59,20 @@ const getOne = asyncHandler(async (req, res) => {
   if (!item) throw ApiError.notFound('Package not found');
 
   const menu = await MenuItem.find({ package: item._id, isAvailable: true });
-  res.json({ success: true, data: { ...item.toObject(), menu } });
+  res.json({
+    success: true,
+    data: { ...item.toObject(), image: absoluteUrl(req, item.image), menu },
+  });
 });
 
 /** POST /api/v1/packages  (admin) */
 const create = asyncHandler(async (req, res) => {
+  if (req.body.image && req.body.image.startsWith('data:')) {
+    req.body.image = saveDataImage('pkg', req.body.image);
+  }
   const payload = { ...req.body, slug: slugify(req.body.slug || req.body.name) };
   const item = await Package.create({ ...payload, createdBy: req.user._id });
+  item.image = absoluteUrl(req, item.image);
   res.status(201).json({ success: true, data: item });
 });
 
@@ -68,12 +80,16 @@ const create = asyncHandler(async (req, res) => {
 const update = asyncHandler(async (req, res) => {
   const payload = { ...req.body };
   if (payload.name && !payload.slug) payload.slug = slugify(payload.name);
+  if (payload.image && payload.image.startsWith('data:')) {
+    payload.image = saveDataImage('pkg', payload.image);
+  }
 
   const item = await Package.findByIdAndUpdate(req.params.id, { $set: payload }, {
     new: true,
     runValidators: true,
   });
   if (!item) throw ApiError.notFound('Package not found');
+  item.image = absoluteUrl(req, item.image);
   res.json({ success: true, data: item });
 });
 

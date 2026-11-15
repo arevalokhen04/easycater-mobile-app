@@ -25,7 +25,7 @@ const PACKAGES = [
     maxGuests: 400,
     isPopular: true,
     rating: 4.8,
-    image: 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800',
+    image: '/images/pkg-kusina-classico.jpg',
     inclusions: ['4 main courses', '2 appetizers', 'Rice & soup', 'Service crew', 'Tables & chairs'],
   },
   {
@@ -37,7 +37,7 @@ const PACKAGES = [
     maxGuests: 300,
     isPopular: true,
     rating: 4.6,
-    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=800',
+    image: '/images/pkg-modern-fusion.jpg',
     inclusions: ['6 main courses', '3 appetizers', 'Dessert station', 'Live carving station', 'Barista cart'],
   },
   {
@@ -48,7 +48,7 @@ const PACKAGES = [
     minGuests: 15,
     maxGuests: 150,
     rating: 4.4,
-    image: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800',
+    image: '/images/pkg-merienda-plated.jpg',
     inclusions: ['Pasta station', 'Chicken station', 'Ginatang station', 'Dessert table', 'Steaming'],
   },
   {
@@ -59,7 +59,7 @@ const PACKAGES = [
     minGuests: 8,
     maxGuests: 80,
     rating: 4.9,
-    image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800',
+    image: '/images/pkg-executive-boardroom.jpg',
     inclusions: ['Appetizer plate', 'Main plate choice', 'Dessert plate', 'Wine pairing', 'Uniformed servers'],
   },
   {
@@ -70,28 +70,28 @@ const PACKAGES = [
     minGuests: 30,
     maxGuests: 350,
     rating: 4.7,
-    image: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=800',
+    image: '/images/pkg-fiesta-grill.jpg',
     inclusions: ['Live grill station', '4 grill selections', 'Sides', 'Dessert', 'Grill chef'],
   },
 ];
 
 // Accurate dish photos from Wikimedia Commons (verified working URLs).
 const MENU_ITEM_IMAGES = {
-  'Kare-Kare': 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Kare-kare.jpg',
-  'Lechon Kawali': 'https://upload.wikimedia.org/wikipedia/commons/c/cc/Lechon_Kawali.jpg',
-  'Lumpiang Shanghai': 'https://upload.wikimedia.org/wikipedia/commons/9/95/Lumpiang_Shanghai_%28Philippines%29.jpg',
-  'Pancit Bihon': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Pancit_bihon_3.jpg/960px-Pancit_bihon_3.jpg',
-  'Salmon Teriyaki': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Salmon_Teriyaki.jpg/960px-Salmon_Teriyaki.jpg',
-  'Beef Caldereta': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Beef_caldereta.jpg/960px-Beef_caldereta.jpg',
-  'Bihon Guisado': 'https://upload.wikimedia.org/wikipedia/commons/b/b3/Pancit_Bihon_Guisado_Recipe.jpg',
-  'Cheese Platter': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/An_artful_arrangement_of_cheese_and_sausage.jpg/960px-An_artful_arrangement_of_cheese_and_sausage.jpg',
-  'Fresh Mango Juice': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Glass_of_Mango_Juice.jpg/960px-Glass_of_Mango_Juice.jpg',
-  'Garlic Butter Shrimp': 'https://upload.wikimedia.org/wikipedia/commons/9/90/Shrimp_with_butter_garlic_and_peas.jpg',
-  'Halo-Halo': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Halo_halo1.jpg/960px-Halo_halo1.jpg',
-  'Leche Flan': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Homemade_Flan.jpg/960px-Homemade_Flan.jpg',
-  'Mung Bean Soup': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/116Monggo_guisado_with_shrimps%2C_tofu_and_eggs_01.jpg/960px-116Monggo_guisado_with_shrimps%2C_tofu_and_eggs_01.jpg',
-  'Pochero': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Puchero_canario.jpg/960px-Puchero_canario.jpg',
-  "Sago't Gulaman": 'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/aa/Gulaman.jpg/960px-Gulaman.jpg',
+  'Kare-Kare': '/images/menu-kare-kare.jpg',
+  'Lechon Kawali': '/images/menu-lechon-kawali.jpg',
+  'Lumpiang Shanghai': '/images/menu-lumpiang-shanghai.jpg',
+  'Pancit Bihon': '/images/menu-pancit-bihon.jpg',
+  'Salmon Teriyaki': '/images/menu-salmon-teriyaki.jpg',
+  'Beef Caldereta': '/images/menu-beef-caldereta.jpg',
+  'Bihon Guisado': '/images/menu-bihon-guisado.jpg',
+  'Cheese Platter': '/images/menu-cheese-platter.jpg',
+  'Fresh Mango Juice': '/images/menu-fresh-mango-juice.jpg',
+  'Garlic Butter Shrimp': '/images/menu-garlic-butter-shrimp.jpg',
+  'Halo-Halo': '/images/menu-halo-halo.jpg',
+  'Leche Flan': '/images/menu-leche-flan.jpg',
+  'Mung Bean Soup': '/images/menu-mung-bean-soup.jpg',
+  'Pochero': '/images/menu-pochero.jpg',
+  'Sago't Gulaman': '/images/menu-sago-t-gulaman.jpg',
 };
 
 const MENU_ITEMS = [
