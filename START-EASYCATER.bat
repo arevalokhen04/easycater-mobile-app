@@ -11,6 +11,10 @@ net start MongoDB >nul 2>&1
 sc query MongoDB | findstr "RUNNING" >nul && echo       MongoDB: RUNNING OK || echo       MongoDB: HINDI TUMAKBO (bawal ang admin - pero auto-start ito pag nag-boot, kaya malamang OK na)
 
 echo.
+echo.
+echo [0/3] Sinisimulan ang PC HOTSPOT (EasyCater-Net / easycater123)...
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0start-hotspot.ps1"
+
 echo [1/3] Backend API (port 4000) - magbubukas ng bagong window...
 start "EasyCater Backend" cmd /k "cd /d C:\Users\Khen\OneDrive\Desktop\cater event\EasyCater\backend-api && npm run dev"
 
