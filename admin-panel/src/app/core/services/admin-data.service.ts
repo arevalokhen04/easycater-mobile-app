@@ -415,9 +415,30 @@ export class AdminDataService {
         })
         .sort((a, b) => b.revenue - a.revenue);
 
+      const nowD = new Date();
+      const sod = new Date(nowD.getFullYear(), nowD.getMonth(), nowD.getDate());
+      const sow = new Date(sod);
+      sow.setDate(sow.getDate() - ((sod.getDay() + 6) % 7));
+      const som = new Date(nowD.getFullYear(), nowD.getMonth(), 1);
+      const soy = new Date(nowD.getFullYear(), 0, 1);
+      const paidAtOf = (p: { paidAt?: string; createdAt?: string }) =>
+        new Date(p.paidAt || p.createdAt || Date.now()).getTime();
+      const periodSums = paid.reduce(
+        (acc, p) => {
+          const t = paidAtOf(p);
+          if (t >= sod.getTime()) acc.daily += p.amount;
+          if (t >= sow.getTime()) acc.weekly += p.amount;
+          if (t >= som.getTime()) acc.monthly += p.amount;
+          if (t >= soy.getTime()) acc.yearly += p.amount;
+          return acc;
+        },
+        { daily: 0, weekly: 0, monthly: 0, yearly: 0 }
+      );
+
       const report: SalesReport = {
         revenue: paid.reduce((sum, p) => sum + p.amount, 0),
         payments: paid.length,
+        revenueByPeriod: periodSums,
         byMethod,
         byPackage,
       };
@@ -426,13 +447,23 @@ export class AdminDataService {
     }
 
     return this.api
-      .get<{ revenue: number; payments: number; byMethod: Record<string, number>; byPackage: SalesReport['byPackage'] }>(
-        '/reports/sales'
-      )
+      .get<{
+        revenue: number;
+        payments: number;
+        revenueByPeriod: { daily: number; weekly: number; monthly: number; yearly: number };
+        byMethod: Record<string, number>;
+        byPackage: SalesReport['byPackage'];
+      }>('/reports/sales')
       .pipe(
         map((r) => ({
           revenue: r.revenue ?? 0,
           payments: r.payments ?? 0,
+          revenueByPeriod: {
+            daily: r.revenueByPeriod?.daily ?? 0,
+            weekly: r.revenueByPeriod?.weekly ?? 0,
+            monthly: r.revenueByPeriod?.monthly ?? 0,
+            yearly: r.revenueByPeriod?.yearly ?? 0,
+          },
           byMethod: r.byMethod ?? {},
           byPackage: [...(r.byPackage ?? [])].sort((a, b) => b.revenue - a.revenue),
         }))

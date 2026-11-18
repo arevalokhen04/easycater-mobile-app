@@ -77,6 +77,7 @@ export interface DashboardSummary {
 export interface SalesReport {
   revenue: number;
   payments: number;
+  revenueByPeriod: { daily: number; weekly: number; monthly: number; yearly: number };
   byMethod: Record<string, number>;
   byPackage: { name: string; category: string; bookings: number; revenue: number }[];
 }

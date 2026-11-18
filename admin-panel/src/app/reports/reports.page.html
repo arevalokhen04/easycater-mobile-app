@@ -43,6 +43,37 @@
         </div>
       </div>
 
+      <div class="grid kpi" style="margin-top: 0">
+        <div class="kpi-card green">
+          <div class="kpi-icon"><ion-icon name="today-outline"></ion-icon></div>
+          <div>
+            <div class="kpi-value">{{ money(report.revenueByPeriod.daily) }}</div>
+            <div class="kpi-label">Today (daily)</div>
+          </div>
+        </div>
+        <div class="kpi-card blue">
+          <div class="kpi-icon"><ion-icon name="calendar-outline"></ion-icon></div>
+          <div>
+            <div class="kpi-value">{{ money(report.revenueByPeriod.weekly) }}</div>
+            <div class="kpi-label">This week</div>
+          </div>
+        </div>
+        <div class="kpi-card amber">
+          <div class="kpi-icon"><ion-icon name="calendar-number-outline"></ion-icon></div>
+          <div>
+            <div class="kpi-value">{{ money(report.revenueByPeriod.monthly) }}</div>
+            <div class="kpi-label">This month</div>
+          </div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-icon"><ion-icon name="bar-chart-outline"></ion-icon></div>
+          <div>
+            <div class="kpi-value">{{ money(report.revenueByPeriod.yearly) }}</div>
+            <div class="kpi-label">This year</div>
+          </div>
+        </div>
+      </div>
+
       <div class="panel" style="margin-top: 16px">
         <div class="panel-head"><h2>Monthly revenue</h2></div>
         <div class="panel-body">

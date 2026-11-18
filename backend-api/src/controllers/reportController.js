@@ -34,12 +34,34 @@ const sales = asyncHandler(async (req, res) => {
     ]),
   ]);
 
+  // Revenue by period - daily / weekly / monthly / yearly (paid payments only).
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfWeek = new Date(startOfDay);
+  startOfWeek.setDate(startOfWeek.getDate() - ((startOfDay.getDay() + 6) % 7)); // Monday start
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+  const periodRows = await Payment.aggregate([
+    { $match: { status: 'paid', paidAt: { $gte: startOfYear } } },
+    {
+      $group: {
+        _id: null,
+        yearly: { $sum: '$amount' },
+        monthly: { $sum: { $cond: [{ $gte: ['$paidAt', startOfMonth] }, '$amount', 0] } },
+        weekly: { $sum: { $cond: [{ $gte: ['$paidAt', startOfWeek] }, '$amount', 0] } },
+        daily: { $sum: { $cond: [{ $gte: ['$paidAt', startOfDay] }, '$amount', 0] } },
+      },
+    },
+  ]);
+
   res.json({
     success: true,
     data: {
       range: { from, to },
       revenue: totals[0]?.revenue || 0,
       payments: totals[0]?.payments || 0,
+      revenueByPeriod: periodRows[0] || { daily: 0, weekly: 0, monthly: 0, yearly: 0 },
       byMethod: (totals[0]?.byMethod || []).reduce((acc, m) => ({ ...acc, [m]: (acc[m] || 0) + 1 }), {}),
       byPackage: byPackage.map((r) => ({
         name: r.package.name,

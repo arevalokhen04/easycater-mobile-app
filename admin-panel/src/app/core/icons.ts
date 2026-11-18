@@ -5,6 +5,7 @@ import {
   arrowUndoOutline,
   barChartOutline,
   businessOutline,
+  calendarNumberOutline,
   calendarOutline,
   cardOutline,
   cashOutline,
@@ -22,6 +23,7 @@ import {
   receiptOutline,
   restaurant,
   restaurantOutline,
+  todayOutline,
   trashOutline,
   walletOutline,
 } from 'ionicons/icons';
@@ -37,6 +39,7 @@ addIcons({
   arrowUndoOutline,
   barChartOutline,
   businessOutline,
+  calendarNumberOutline,
   calendarOutline,
   cardOutline,
   cashOutline,
@@ -54,6 +57,7 @@ addIcons({
   receiptOutline,
   restaurant,
   restaurantOutline,
+  todayOutline,
   trashOutline,
   walletOutline,
 });
