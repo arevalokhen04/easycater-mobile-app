@@ -135,20 +135,37 @@ export class MenuAdminPage implements OnInit {
       });
   }
 
-  toggleAvailable(item: AdminMenuItem): void {
+  /** Confirmation first - sold out items disappear from the customer menu. */
+  async toggleAvailable(item: AdminMenuItem): Promise<void> {
     if (this.busy()) return;
-    this.busy.set(true);
-    this.data.toggleMenuItem(item.id).subscribe({
-      next: () => {
-        this.busy.set(false);
-        this.load();
-        this.notify(`${item.name} is now ${item.isAvailable ? 'unavailable' : 'available'}`);
-      },
-      error: (err: Error) => {
-        this.busy.set(false);
-        this.notify(err.message);
-      },
+    const action = item.isAvailable ? 'Mark sold out' : 'Mark available';
+    const alert = await this.alert.create({
+      header: `${action} this dish?`,
+      message: `"${item.name}" will be ${item.isAvailable ? 'removed from the customer menu' : 'added back to the customer menu'}.`,
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: action,
+          role: item.isAvailable ? 'destructive' : 'confirm',
+          handler: () => {
+            if (this.busy()) return;
+            this.busy.set(true);
+            this.data.toggleMenuItem(item.id).subscribe({
+              next: () => {
+                this.busy.set(false);
+                this.load();
+                this.notify(`${item.name} is now ${item.isAvailable ? 'unavailable' : 'available'}`);
+              },
+              error: (err: Error) => {
+                this.busy.set(false);
+                this.notify(err.message);
+              },
+            });
+          },
+        },
+      ],
     });
+    await alert.present();
   }
 
   async confirmDelete(item: AdminMenuItem): Promise<void> {

@@ -43,20 +43,37 @@ export class CustomersAdminPage implements OnInit {
     this.load();
   }
 
-  toggleActive(c: AdminUser): void {
+  /** Confirmation first - a disabled customer loses app access immediately. */
+  async toggleActive(c: AdminUser): Promise<void> {
     if (this.busy()) return;
-    this.busy.set(true);
-    this.data.toggleCustomerActive(c.id).subscribe({
-      next: () => {
-        this.busy.set(false);
-        this.load();
-        this.notify(`${c.name} is now ${c.isActive ? 'disabled' : 'enabled'}`);
-      },
-      error: (err: Error) => {
-        this.busy.set(false);
-        this.notify(err.message);
-      },
+    const action = c.isActive ? 'Disable' : 'Enable';
+    const alert = await this.alert.create({
+      header: `${action} this customer?`,
+      message: `"${c.name}" will ${c.isActive ? 'no longer be able to log in or place orders' : ' regain full app access'}.`,
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: action,
+          role: c.isActive ? 'destructive' : 'confirm',
+          handler: () => {
+            if (this.busy()) return;
+            this.busy.set(true);
+            this.data.toggleCustomerActive(c.id).subscribe({
+              next: () => {
+                this.busy.set(false);
+                this.load();
+                this.notify(`${c.name} is now ${c.isActive ? 'disabled' : 'enabled'}`);
+              },
+              error: (err: Error) => {
+                this.busy.set(false);
+                this.notify(err.message);
+              },
+            });
+          },
+        },
+      ],
     });
+    await alert.present();
   }
 
   async confirmDelete(c: AdminUser): Promise<void> {

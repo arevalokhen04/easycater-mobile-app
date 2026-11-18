@@ -158,20 +158,37 @@ export class PackagesAdminPage implements OnInit {
       });
   }
 
-  toggleActive(pkg: AdminPackage): void {
+  /** Confirmation first - hiding a package instantly affects customers. */
+  async toggleActive(pkg: AdminPackage): Promise<void> {
     if (this.busy()) return;
-    this.busy.set(true);
-    this.data.togglePackageActive(pkg.id).subscribe({
-      next: () => {
-        this.busy.set(false);
-        this.load();
-        this.notify(`${pkg.name} is now ${pkg.isActive ? 'hidden' : 'visible'}`);
-      },
-      error: (err: Error) => {
-        this.busy.set(false);
-        this.notify(err.message);
-      },
+    const action = pkg.isActive ? 'Hide' : 'Show';
+    const alert = await this.alert.create({
+      header: `${action} this package?`,
+      message: `"${pkg.name}" will be ${pkg.isActive ? 'hidden from' : 'restored to'} the customer app.`,
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: action,
+          role: pkg.isActive ? 'destructive' : 'confirm',
+          handler: () => {
+            if (this.busy()) return;
+            this.busy.set(true);
+            this.data.togglePackageActive(pkg.id).subscribe({
+              next: () => {
+                this.busy.set(false);
+                this.load();
+                this.notify(`${pkg.name} is now ${pkg.isActive ? 'hidden' : 'visible'}`);
+              },
+              error: (err: Error) => {
+                this.busy.set(false);
+                this.notify(err.message);
+              },
+            });
+          },
+        },
+      ],
     });
+    await alert.present();
   }
 
   async confirmDelete(pkg: AdminPackage): Promise<void> {
