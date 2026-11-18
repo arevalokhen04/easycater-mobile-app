@@ -72,6 +72,7 @@ export class CartPage implements OnInit {
       next: (booking) => {
         this.cart.setActiveBooking(booking);
         this.creating.set(false);
+        this.notify(`Booking ${booking.bookingNumber} created - choose your payment option`);
         this.router.navigateByUrl('/payment');
       },
       error: (err: Error) => {

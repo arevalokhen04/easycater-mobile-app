@@ -263,6 +263,7 @@ export class BookingPage implements OnInit, AfterViewInit {
     });
 
     // Next step in the flow: add extras from the menu, then review the cart.
+    this.notify('Details saved - now add your extras!');
     this.router.navigateByUrl('/tabs/menu');
   }
 

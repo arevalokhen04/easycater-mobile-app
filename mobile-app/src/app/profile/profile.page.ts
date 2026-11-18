@@ -96,7 +96,10 @@ export class ProfilePage implements OnInit {
         address: this.editAddress().trim(),
       })
       .subscribe({
-        next: () => this.editing.set(false),
+        next: () => {
+          this.editing.set(false);
+          this.notify('Profile updated');
+        },
         error: (err: Error) => this.notify(err?.message || 'Could not save your profile'),
       });
   }
