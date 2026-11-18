@@ -17,3 +17,67 @@
     color: var(--ion-color-primary);
   }
 }
+
+/* ---- Top packages by bookings chart ---- */
+.top-flag {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ion-color-primary);
+  background: rgba(242, 118, 13, 0.1);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+.top-pkg-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 18px 8px;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  &.bar-leader .bar-fill {
+    background: linear-gradient(90deg, #f2760d, #ff9a3d);
+    box-shadow: 0 3px 10px rgba(242, 118, 13, 0.35);
+  }
+}
+
+.bar-name {
+  width: 190px;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ec-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.bar-track {
+  flex: 1;
+  height: 22px;
+  background: #f4f4f8;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f7a44a, #f2760d);
+  transition: width 0.5s ease;
+}
+
+.bar-value {
+  width: 84px;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ec-muted);
+  white-space: nowrap;
+}

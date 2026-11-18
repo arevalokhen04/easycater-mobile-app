@@ -30,6 +30,25 @@ export class DashboardPage implements OnInit {
     });
   }
 
+  /** Packages ranked by how often they get booked - most booked first. */
+  topPackages(): { name: string; bookings: number }[] {
+    return this.summary()?.topPackages ?? [];
+  }
+
+  maxBookings(): number {
+    const list = this.topPackages();
+    return Math.max(...list.map((p) => p.bookings), 1);
+  }
+
+  bookingsBarWidth(bookings: number): number {
+    return Math.round((bookings / this.maxBookings()) * 100);
+  }
+
+  topPackageName(): string {
+    const list = this.topPackages();
+    return list.length ? `${list[0].name} (${list[0].bookings} bookings)` : '';
+  }
+
   get adminName(): string {
     return this.auth.user()?.name ?? 'Administrator';
   }

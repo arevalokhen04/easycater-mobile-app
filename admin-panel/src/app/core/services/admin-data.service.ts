@@ -119,6 +119,15 @@ export class AdminDataService {
         totalCustomers: this.customers.length,
         activePackages: this.packages.filter((p) => p.isActive).length,
         activeMenuItems: this.menu.filter((m) => m.isAvailable).length,
+        topPackages: this.packages
+          .map((p) => ({
+            name: p.name,
+            bookings: this.bookings.filter(
+              (b) => b.status !== 'cancelled' && b.packageName === p.name
+            ).length,
+          }))
+          .sort((a, b) => b.bookings - a.bookings)
+          .slice(0, 5),
         revenueTrend: this.buildTrend(6, paid),
         recentBookings: [...this.bookings].sort((a, b) => b.eventDate.localeCompare(a.eventDate)).slice(0, 5),
       };
@@ -141,6 +150,7 @@ export class AdminDataService {
                 totalCustomers: (d.totalCustomers as number) ?? 0,
                 activePackages: (d.totalPackages as number) ?? 0,
                 activeMenuItems: (d.activeMenuItems as number) ?? 0,
+                topPackages: (d.topPackages as { name: string; bookings: number }[]) ?? [],
                 revenueTrend: chart.map((c) => ({ label: c.label, revenue: c.revenue, bookings: c.count })),
                 recentBookings: recent.map(mapAdminBooking),
               } satisfies DashboardSummary;

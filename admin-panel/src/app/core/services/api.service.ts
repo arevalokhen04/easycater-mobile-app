@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, from, map, throwError } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
+import { catchError, switchMap, timeout } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
 
@@ -65,6 +65,8 @@ export class ApiService {
           params: params as never,
         })
       ),
+      // Fail fast instead of hanging forever when the backend is unreachable.
+      timeout(12000),
       map((r) => r.data),
       catchError(this.toPlainError)
     );

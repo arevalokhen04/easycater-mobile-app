@@ -69,6 +69,7 @@ export interface DashboardSummary {
   totalCustomers: number;
   activePackages: number;
   activeMenuItems: number;
+  topPackages: { name: string; bookings: number }[];
   revenueTrend: { label: string; revenue: number; bookings: number }[];
   recentBookings: AdminBooking[];
 }

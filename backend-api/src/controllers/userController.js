@@ -62,6 +62,19 @@ const updateUser = asyncHandler(async (req, res) => {
     if (req.body[key] !== undefined) payload[key] = req.body[key];
   });
 
+  const target = await User.findById(req.params.id);
+  if (!target) throw ApiError.notFound('User not found');
+
+  // Admin accounts are protected: no disabling, no demotion, no role games.
+  if (target.role === 'admin') {
+    if (payload.isActive === false) {
+      throw ApiError.badRequest('Admin accounts cannot be disabled');
+    }
+    if (payload.role && payload.role !== 'admin') {
+      throw ApiError.badRequest('Admin accounts cannot change role');
+    }
+  }
+
   const user = await User.findByIdAndUpdate(
     req.params.id,
     { $set: payload },
@@ -76,8 +89,12 @@ const deleteUser = asyncHandler(async (req, res) => {
   if (req.params.id === req.user._id.toString()) {
     throw ApiError.badRequest('You cannot delete your own account');
   }
-  const user = await User.findByIdAndDelete(req.params.id);
+  const user = await User.findById(req.params.id);
   if (!user) throw ApiError.notFound('User not found');
+  if (user.role === 'admin') {
+    throw ApiError.badRequest('Admin accounts cannot be deleted');
+  }
+  await User.findByIdAndDelete(req.params.id);
   res.json({ success: true, message: 'User deleted' });
 });
 

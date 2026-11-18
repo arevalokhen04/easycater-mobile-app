@@ -25,6 +25,7 @@ const summary = asyncHandler(async (_req, res) => {
     revenueAgg,
     bookingsByStatus,
     recentBookings,
+    topPackagesAgg,
   ] = await Promise.all([
     Booking.countDocuments(),
     Booking.countDocuments({ status: 'pending' }),
@@ -42,6 +43,23 @@ const summary = asyncHandler(async (_req, res) => {
       .populate('package', 'name')
       .sort({ createdAt: -1 })
       .limit(5),
+    // Most booked packages (live bookings, non-cancelled) for the dashboard chart.
+    Booking.aggregate([
+      { $match: { status: { $ne: 'cancelled' } } },
+      { $group: { _id: '$package', bookings: { $sum: 1 } } },
+      { $sort: { bookings: -1 } },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from: 'packages',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'pkg',
+        },
+      },
+      { $unwind: '$pkg' },
+      { $project: { name: '$pkg.name', bookings: 1, _id: 0 } },
+    ]),
   ]);
 
   res.json({
@@ -55,6 +73,7 @@ const summary = asyncHandler(async (_req, res) => {
       activeMenuItems,
       totalRevenue: revenueAgg[0]?.total || 0,
       bookingsByStatus: Object.fromEntries(bookingsByStatus.map((r) => [r._id, r.count])),
+      topPackages: topPackagesAgg,
       recentBookings,
     },
   });
