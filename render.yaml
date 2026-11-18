@@ -1,0 +1,25 @@
+# EasyCater backend - Render.com blueprint (free tier)
+# Deploy: push this file to GitHub, then in Render.com choose
+# "New +" -> "Blueprint" -> pick arevalokhen04/easycater-mobile-app.
+# Set the MONGO_URI prompt to your MongoDB Atlas connection string.
+
+services:
+  - type: web
+    name: easycater-api
+    runtime: node
+    rootDir: backend-api
+    plan: free
+    buildCommand: npm install
+    startCommand: node src/server.js
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 30d
+      - key: CORS_ORIGIN
+        value: http://localhost,https://localhost,http://localhost:8100,http://localhost:8101
