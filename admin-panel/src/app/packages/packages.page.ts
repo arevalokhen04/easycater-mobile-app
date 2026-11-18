@@ -106,6 +106,17 @@ export class PackagesAdminPage implements OnInit {
     reader.readAsDataURL(file);
   }
 
+  /** Rating policy: only 1-5 (no negatives, no overflow) - clamped live. */
+  setRating(value: string): void {
+    const cleaned = value.replace(/[^\d.]/g, '');
+    if (!cleaned || cleaned.endsWith('.')) {
+      this.cRating.set(cleaned);
+      return;
+    }
+    const n = Number(cleaned);
+    this.cRating.set(String(Math.min(5, Math.max(1, n))));
+  }
+
   async confirmCreate(): Promise<void> {
     if (this.busy()) return;
     const name = this.cName().trim();

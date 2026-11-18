@@ -71,6 +71,11 @@ const create = asyncHandler(async (req, res) => {
     req.body.image = saveDataImage('pkg', req.body.image);
   }
   const payload = { ...req.body, slug: slugify(req.body.slug || req.body.name) };
+  // Rating policy: 1-5 only - negatives and overflow values are clamped.
+  if (payload.rating !== undefined && payload.rating !== null && payload.rating !== '') {
+    const n = Number(payload.rating);
+    payload.rating = Number.isNaN(n) ? undefined : Math.min(5, Math.max(1, n));
+  }
   const item = await Package.create({ ...payload, createdBy: req.user._id });
   item.image = absoluteUrl(req, item.image);
   res.status(201).json({ success: true, data: item });
@@ -82,6 +87,10 @@ const update = asyncHandler(async (req, res) => {
   if (payload.name && !payload.slug) payload.slug = slugify(payload.name);
   if (payload.image && payload.image.startsWith('data:')) {
     payload.image = saveDataImage('pkg', payload.image);
+  }
+  if (payload.rating !== undefined && payload.rating !== null && payload.rating !== '') {
+    const n = Number(payload.rating);
+    payload.rating = Number.isNaN(n) ? undefined : Math.min(5, Math.max(1, n));
   }
 
   const item = await Package.findByIdAndUpdate(req.params.id, { $set: payload }, {
