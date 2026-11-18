@@ -22,14 +22,16 @@ export class MenuAdminPage implements OnInit {
   /** Filter chips skip the "all" entry for the create form's dropdown. */
   readonly categoryChoices = this.categories.filter((c) => c !== 'all');
 
-  // ---- create-menu-item modal state ----
+  // ---- create/edit menu item modal state ----
   readonly createOpen = signal(false);
+  readonly editingId = signal<string | null>(null);
   readonly cName = signal('');
   readonly cPrice = signal('');
   readonly cCategory = signal('main-course');
   readonly cImageUrl = signal('');
   readonly cPhoto = signal('');
   readonly cPreview = computed(() => this.cPhoto() || this.cImageUrl().trim());
+  readonly modalTitle = computed(() => (this.editingId() ? 'Edit menu item' : 'New menu item'));
 
   constructor(
     private data: AdminDataService,
@@ -57,6 +59,7 @@ export class MenuAdminPage implements OnInit {
 
   /** Opens the create modal with fresh fields (photo included). */
   openCreate(): void {
+    this.editingId.set(null);
     this.cName.set('');
     this.cPrice.set('');
     this.cCategory.set('main-course');
@@ -65,8 +68,20 @@ export class MenuAdminPage implements OnInit {
     this.createOpen.set(true);
   }
 
+  /** Opens the same modal prefilled with the dish's current values. */
+  openEdit(item: AdminMenuItem): void {
+    this.editingId.set(item.id);
+    this.cName.set(item.name);
+    this.cPrice.set(String(item.price));
+    this.cCategory.set(item.category);
+    this.cImageUrl.set(item.image ?? '');
+    this.cPhoto.set('');
+    this.createOpen.set(true);
+  }
+
   closeCreate(): void {
     this.createOpen.set(false);
+    this.editingId.set(null);
   }
 
   /** Reads the picked photo into a data URL for the preview and payload. */
@@ -92,9 +107,11 @@ export class MenuAdminPage implements OnInit {
       return;
     }
     const image = this.cPhoto() || this.cImageUrl().trim();
+    const editing = this.editingId();
     this.busy.set(true);
     this.data
       .saveMenuItem({
+        ...(editing ? { id: editing } : {}),
         name,
         price,
         category: this.cCategory(),
@@ -105,7 +122,7 @@ export class MenuAdminPage implements OnInit {
           this.busy.set(false);
           this.closeCreate();
           this.load();
-          this.notify('Menu item created');
+          this.notify(editing ? 'Menu item updated' : 'Menu item created');
         },
         error: (err: Error) => {
           this.busy.set(false);

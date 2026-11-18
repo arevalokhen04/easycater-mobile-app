@@ -86,6 +86,9 @@
                       </span>
                     </td>
                     <td>
+                      <ion-button fill="clear" size="small" color="primary" [disabled]="busy()" (click)="openEdit(m)">
+                        Edit
+                      </ion-button>
                       <ion-button fill="clear" size="small" [disabled]="busy()" (click)="toggleAvailable(m)">
                         {{ m.isAvailable ? 'Mark sold out' : 'Mark available' }}
                       </ion-button>
@@ -116,6 +119,9 @@
               <p class="card-ref">{{ m.category | titlecase }} · {{ money(m.price) }} @if (m.isFeatured) { · Featured }</p>
 
               <div class="mob-actions">
+                <ion-button fill="outline" size="small" color="primary" [disabled]="busy()" (click)="openEdit(m)">
+                  Edit
+                </ion-button>
                 <ion-button fill="outline" size="small" [disabled]="busy()" (click)="toggleAvailable(m)">
                   {{ m.isAvailable ? 'Mark sold out' : 'Mark available' }}
                 </ion-button>
@@ -135,7 +141,7 @@
 <ion-modal [isOpen]="createOpen()" (didDismiss)="closeCreate()">
   <ng-template>
     <div class="create-card">
-      <h2>New menu item</h2>
+      <h2>{{ modalTitle() }}</h2>
 
       <ion-item class="ec-field" lines="none">
         <ion-label position="stacked">Dish name</ion-label>
@@ -199,7 +205,7 @@
       }
 
       <ion-button expand="block" [disabled]="busy()" (click)="confirmCreate()">
-        {{ busy() ? 'Creating...' : 'Create menu item' }}
+        {{ busy() ? 'Saving...' : (editingId() ? 'Save changes' : 'Create menu item') }}
       </ion-button>
       <ion-button expand="block" fill="clear" color="medium" (click)="closeCreate()">
         Cancel

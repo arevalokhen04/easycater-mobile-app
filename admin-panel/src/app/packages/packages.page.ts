@@ -26,15 +26,19 @@ export class PackagesAdminPage implements OnInit {
     { value: 'other', label: 'Other' },
   ];
 
-  // ---- create-package modal state ----
+  // ---- create/edit package modal state ----
   readonly createOpen = signal(false);
+  readonly editingId = signal<string | null>(null);
   readonly cName = signal('');
   readonly cPrice = signal('');
   readonly cCategory = signal('wedding');
   readonly cImageUrl = signal('');
   readonly cPhoto = signal('');
   readonly cRating = signal('4.5');
+  readonly cMin = signal('10');
+  readonly cMax = signal('200');
   readonly cPreview = computed(() => this.cPhoto() || this.cImageUrl().trim());
+  readonly modalTitle = computed(() => (this.editingId() ? 'Edit package' : 'New package'));
 
   constructor(
     private data: AdminDataService,
@@ -57,17 +61,35 @@ export class PackagesAdminPage implements OnInit {
 
   /** Opens the create modal with fresh fields (photo + rating included). */
   openCreate(): void {
+    this.editingId.set(null);
     this.cName.set('');
     this.cPrice.set('');
     this.cCategory.set('wedding');
     this.cImageUrl.set('');
     this.cPhoto.set('');
     this.cRating.set('4.5');
+    this.cMin.set('10');
+    this.cMax.set('200');
+    this.createOpen.set(true);
+  }
+
+  /** Opens the same modal prefilled with the package's current values. */
+  openEdit(pkg: AdminPackage): void {
+    this.editingId.set(pkg.id);
+    this.cName.set(pkg.name);
+    this.cPrice.set(String(pkg.pricePerHead));
+    this.cCategory.set(pkg.category);
+    this.cImageUrl.set(pkg.image ?? '');
+    this.cPhoto.set('');
+    this.cRating.set(String(pkg.rating ?? 4.5));
+    this.cMin.set(String(pkg.minGuests));
+    this.cMax.set(String(pkg.maxGuests));
     this.createOpen.set(true);
   }
 
   closeCreate(): void {
     this.createOpen.set(false);
+    this.editingId.set(null);
   }
 
   /** Reads the picked photo into a data URL for the preview and payload. */
@@ -94,21 +116,25 @@ export class PackagesAdminPage implements OnInit {
       return;
     }
     const image = this.cPhoto() || this.cImageUrl().trim();
+    const editing = this.editingId();
     this.busy.set(true);
     this.data
       .savePackage({
+        ...(editing ? { id: editing } : {}),
         name,
         pricePerHead: price,
         category: this.cCategory(),
         image,
         rating,
+        minGuests: Number(this.cMin()) || 10,
+        maxGuests: Number(this.cMax()) || 200,
       })
       .subscribe({
         next: () => {
           this.busy.set(false);
           this.closeCreate();
           this.load();
-          this.notify('Package created');
+          this.notify(editing ? 'Package updated' : 'Package created');
         },
         error: (err: Error) => {
           this.busy.set(false);

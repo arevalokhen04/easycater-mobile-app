@@ -80,6 +80,9 @@
                       </span>
                     </td>
                     <td>
+                      <ion-button fill="clear" size="small" color="primary" [disabled]="busy()" (click)="openEdit(p)">
+                        Edit
+                      </ion-button>
                       <ion-button fill="clear" size="small" [disabled]="busy()" (click)="toggleActive(p)">
                         {{ p.isActive ? 'Hide' : 'Show' }}
                       </ion-button>
@@ -116,6 +119,9 @@
               </div>
 
               <div class="mob-actions">
+                <ion-button fill="outline" size="small" color="primary" [disabled]="busy()" (click)="openEdit(p)">
+                  Edit
+                </ion-button>
                 <ion-button fill="outline" size="small" [disabled]="busy()" (click)="toggleActive(p)">
                   {{ p.isActive ? 'Hide' : 'Show' }}
                 </ion-button>
@@ -135,7 +141,7 @@
 <ion-modal [isOpen]="createOpen()" (didDismiss)="closeCreate()">
   <ng-template>
     <div class="create-card">
-      <h2>New package</h2>
+      <h2>{{ modalTitle() }}</h2>
 
       <ion-item class="ec-field" lines="none">
         <ion-label position="stacked">Package name</ion-label>
@@ -169,6 +175,29 @@
             [ngModel]="cRating()"
             (ngModelChange)="cRating.set($event)"
             name="cRating"
+          ></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="row2">
+        <ion-item class="ec-field" lines="none">
+          <ion-label position="stacked">Min guests</ion-label>
+          <ion-input
+            type="number"
+            min="1"
+            [ngModel]="cMin()"
+            (ngModelChange)="cMin.set($event)"
+            name="cMin"
+          ></ion-input>
+        </ion-item>
+        <ion-item class="ec-field" lines="none">
+          <ion-label position="stacked">Max guests</ion-label>
+          <ion-input
+            type="number"
+            min="1"
+            [ngModel]="cMax()"
+            (ngModelChange)="cMax.set($event)"
+            name="cMax"
           ></ion-input>
         </ion-item>
       </div>
@@ -212,7 +241,7 @@
       }
 
       <ion-button expand="block" [disabled]="busy()" (click)="confirmCreate()">
-        {{ busy() ? 'Creating...' : 'Create package' }}
+        {{ busy() ? 'Saving...' : (editingId() ? 'Save changes' : 'Create package') }}
       </ion-button>
       <ion-button expand="block" fill="clear" color="medium" (click)="closeCreate()">
         Cancel
