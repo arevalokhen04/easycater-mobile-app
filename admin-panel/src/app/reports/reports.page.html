@@ -58,6 +58,26 @@
         </div>
       </div>
 
+      @if (topPackages().length) {
+        <div class="panel" style="margin-top: 16px">
+          <div class="panel-head">
+            <h2>Top packages by bookings</h2>
+            <span class="top-flag">🏆 Most booked: {{ topPackageName() }}</span>
+          </div>
+          <div class="top-pkg-chart">
+            @for (p of topPackages(); track p.name) {
+              <div class="bar-row" [class.bar-leader]="p.bookings === maxBookings()">
+                <span class="bar-name">{{ p.name }}</span>
+                <div class="bar-track">
+                  <div class="bar-fill" [style.width.%]="bookingsBarWidth(p.bookings)"></div>
+                </div>
+                <span class="bar-value">{{ p.bookings }} booked</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
       <div class="grid two" style="margin-top: 16px">
         <div class="panel">
           <div class="panel-head"><h2>Sales by package</h2></div>

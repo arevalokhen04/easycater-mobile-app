@@ -48,4 +48,27 @@ export class ReportsAdminPage implements OnInit {
     const entries = this.methodEntries();
     return Math.max(...entries.map((e) => e.count), 1);
   }
+
+  /** Packages ranked by how often they get booked - most booked first. */
+  topPackages(): { name: string; category: string; bookings: number; revenue: number }[] {
+    const report = this.report();
+    if (!report) return [];
+    return [...report.byPackage]
+      .sort((a, b) => b.bookings - a.bookings)
+      .slice(0, 8);
+  }
+
+  maxBookings(): number {
+    const list = this.topPackages();
+    return Math.max(...list.map((p) => p.bookings), 1);
+  }
+
+  bookingsBarWidth(bookings: number): number {
+    return Math.round((bookings / this.maxBookings()) * 100);
+  }
+
+  topPackageName(): string {
+    const list = this.topPackages();
+    return list.length ? `${list[0].name} (${list[0].bookings} bookings)` : '';
+  }
 }
