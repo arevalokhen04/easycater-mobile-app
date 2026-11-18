@@ -30,6 +30,7 @@ export class MenuAdminPage implements OnInit {
   readonly cCategory = signal('main-course');
   readonly cImageUrl = signal('');
   readonly cPhoto = signal('');
+  readonly cPhotoName = signal('');
   readonly cPreview = computed(() => this.cPhoto() || this.cImageUrl().trim());
   readonly modalTitle = computed(() => (this.editingId() ? 'Edit menu item' : 'New menu item'));
 
@@ -65,6 +66,7 @@ export class MenuAdminPage implements OnInit {
     this.cCategory.set('main-course');
     this.cImageUrl.set('');
     this.cPhoto.set('');
+    this.cPhotoName.set('');
     this.createOpen.set(true);
   }
 
@@ -76,6 +78,7 @@ export class MenuAdminPage implements OnInit {
     this.cCategory.set(item.category);
     this.cImageUrl.set(item.image ?? '');
     this.cPhoto.set('');
+    this.cPhotoName.set('');
     this.createOpen.set(true);
   }
 
@@ -89,6 +92,7 @@ export class MenuAdminPage implements OnInit {
     const input = event.target as HTMLInputElement;
     const file = input.files && input.files[0];
     if (!file) return;
+    this.cPhotoName.set(file.name);
     const reader = new FileReader();
     reader.onload = () => this.cPhoto.set(String(reader.result || ''));
     reader.readAsDataURL(file);

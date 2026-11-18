@@ -34,6 +34,7 @@ export class PackagesAdminPage implements OnInit {
   readonly cCategory = signal('wedding');
   readonly cImageUrl = signal('');
   readonly cPhoto = signal('');
+  readonly cPhotoName = signal('');
   readonly cRating = signal('4.5');
   readonly cMin = signal('10');
   readonly cMax = signal('200');
@@ -67,6 +68,7 @@ export class PackagesAdminPage implements OnInit {
     this.cCategory.set('wedding');
     this.cImageUrl.set('');
     this.cPhoto.set('');
+    this.cPhotoName.set('');
     this.cRating.set('4.5');
     this.cMin.set('10');
     this.cMax.set('200');
@@ -81,6 +83,7 @@ export class PackagesAdminPage implements OnInit {
     this.cCategory.set(pkg.category);
     this.cImageUrl.set(pkg.image ?? '');
     this.cPhoto.set('');
+    this.cPhotoName.set('');
     this.cRating.set(String(pkg.rating ?? 4.5));
     this.cMin.set(String(pkg.minGuests));
     this.cMax.set(String(pkg.maxGuests));
@@ -97,6 +100,7 @@ export class PackagesAdminPage implements OnInit {
     const input = event.target as HTMLInputElement;
     const file = input.files && input.files[0];
     if (!file) return;
+    this.cPhotoName.set(file.name);
     const reader = new FileReader();
     reader.onload = () => this.cPhoto.set(String(reader.result || ''));
     reader.readAsDataURL(file);

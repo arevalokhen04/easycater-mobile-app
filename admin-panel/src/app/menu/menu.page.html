@@ -137,11 +137,17 @@
   </div>
 </ion-content>
 
-<!-- Create-menu-item modal: dish, price, category and photo. -->
-<ion-modal [isOpen]="createOpen()" (didDismiss)="closeCreate()">
+<!-- Create/edit menu item modal -->
+<ion-modal [isOpen]="createOpen()" (didDismiss)="closeCreate()" class="form-modal">
   <ng-template>
     <div class="create-card">
-      <h2>{{ modalTitle() }}</h2>
+      <div class="card-title">
+        <span class="title-icon"><ion-icon name="restaurant-outline"></ion-icon></span>
+        <div>
+          <h2>{{ modalTitle() }}</h2>
+          <p>Set the dish details customers will see.</p>
+        </div>
+      </div>
 
       <ion-item class="ec-field" lines="none">
         <ion-label position="stacked">Dish name</ion-label>
@@ -180,15 +186,14 @@
         </ion-item>
       </div>
 
-      <ion-item class="ec-field" lines="none">
-        <ion-label position="stacked">Insert photo</ion-label>
-        <input
-          type="file"
-          accept="image/*"
-          class="photo-input"
-          (change)="onPhotoSelected($event)"
-        />
-      </ion-item>
+      <label class="photo-picker">
+        <input type="file" accept="image/*" (change)="onPhotoSelected($event)" />
+        <ion-icon name="image-outline"></ion-icon>
+        <span class="picker-text">
+          <b>{{ cPhotoName() || 'Choose a photo from your device' }}</b>
+          <small>or paste an image URL below</small>
+        </span>
+      </label>
 
       <ion-item class="ec-field" lines="none">
         <ion-label position="stacked">or paste an image URL</ion-label>
@@ -204,7 +209,7 @@
         <img [src]="src" alt="Dish preview" class="photo-preview" />
       }
 
-      <ion-button expand="block" [disabled]="busy()" (click)="confirmCreate()">
+      <ion-button expand="block" class="btn-save" [disabled]="busy()" (click)="confirmCreate()">
         {{ busy() ? 'Saving...' : (editingId() ? 'Save changes' : 'Create menu item') }}
       </ion-button>
       <ion-button expand="block" fill="clear" color="medium" (click)="closeCreate()">
@@ -213,3 +218,4 @@
     </div>
   </ng-template>
 </ion-modal>
+

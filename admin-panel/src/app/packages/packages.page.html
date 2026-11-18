@@ -137,11 +137,17 @@
   </div>
 </ion-content>
 
-<!-- Create-package modal: name, price, category, photo and rating. -->
-<ion-modal [isOpen]="createOpen()" (didDismiss)="closeCreate()">
+<!-- Create/edit package modal -->
+<ion-modal [isOpen]="createOpen()" (didDismiss)="closeCreate()" class="form-modal">
   <ng-template>
     <div class="create-card">
-      <h2>{{ modalTitle() }}</h2>
+      <div class="card-title">
+        <span class="title-icon"><ion-icon name="cube-outline"></ion-icon></span>
+        <div>
+          <h2>{{ modalTitle() }}</h2>
+          <p>Set the details customers will see.</p>
+        </div>
+      </div>
 
       <ion-item class="ec-field" lines="none">
         <ion-label position="stacked">Package name</ion-label>
@@ -153,9 +159,9 @@
         ></ion-input>
       </ion-item>
 
-      <div class="row2">
+      <div class="row3">
         <ion-item class="ec-field" lines="none">
-          <ion-label position="stacked">Price per head (PHP)</ion-label>
+          <ion-label position="stacked">Price / head (PHP)</ion-label>
           <ion-input
             type="number"
             min="1"
@@ -216,15 +222,14 @@
         </ion-select>
       </ion-item>
 
-      <ion-item class="ec-field" lines="none">
-        <ion-label position="stacked">Insert photo</ion-label>
-        <input
-          type="file"
-          accept="image/*"
-          class="photo-input"
-          (change)="onPhotoSelected($event)"
-        />
-      </ion-item>
+      <label class="photo-picker">
+        <input type="file" accept="image/*" (change)="onPhotoSelected($event)" />
+        <ion-icon name="image-outline"></ion-icon>
+        <span class="picker-text">
+          <b>{{ cPhotoName() || 'Choose a photo from your device' }}</b>
+          <small>or paste an image URL below</small>
+        </span>
+      </label>
 
       <ion-item class="ec-field" lines="none">
         <ion-label position="stacked">or paste an image URL</ion-label>
@@ -240,7 +245,7 @@
         <img [src]="src" alt="Package preview" class="photo-preview" />
       }
 
-      <ion-button expand="block" [disabled]="busy()" (click)="confirmCreate()">
+      <ion-button expand="block" class="btn-save" [disabled]="busy()" (click)="confirmCreate()">
         {{ busy() ? 'Saving...' : (editingId() ? 'Save changes' : 'Create package') }}
       </ion-button>
       <ion-button expand="block" fill="clear" color="medium" (click)="closeCreate()">
@@ -249,3 +254,4 @@
     </div>
   </ng-template>
 </ion-modal>
+
