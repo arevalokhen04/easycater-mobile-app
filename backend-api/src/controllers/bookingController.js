@@ -5,6 +5,7 @@ const Payment = require('../models/Payment');
 const Notification = require('../models/Notification');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
+const { absoluteUrl } = require('../utils/images');
 
 const SERVICE_RATE = 0.10; // 10%
 const TAX_RATE = 0.12; // 12%
@@ -83,6 +84,13 @@ const list = asyncHandler(async (req, res) => {
     Booking.countDocuments(filter),
   ]);
 
+  // Populated package photos must be absolute for the requesting client.
+  items.forEach((b) => {
+    if (b.package && typeof b.package === 'object' && b.package.image) {
+      b.package.image = absoluteUrl(req, b.package.image);
+    }
+  });
+
   const paidSums = await paidTotals(items.map((b) => b._id));
   res.json({
     success: true,
@@ -112,6 +120,16 @@ const getOne = asyncHandler(async (req, res) => {
   if (req.user.role !== 'admin' && booking.customer._id.toString() !== req.user._id.toString()) {
     throw ApiError.forbidden('Not your booking');
   }
+
+  // Absolute image URLs for the populated package and add-on dishes.
+  if (booking.package && typeof booking.package === 'object' && booking.package.image) {
+    booking.package.image = absoluteUrl(req, booking.package.image);
+  }
+  (booking.addOns || []).forEach((a) => {
+    if (a.menuItem && typeof a.menuItem === 'object' && a.menuItem.image) {
+      a.menuItem.image = absoluteUrl(req, a.menuItem.image);
+    }
+  });
 
   const payments = await Payment.find({ booking: booking._id }).sort({ createdAt: -1 });
   const amountPaid = payments
