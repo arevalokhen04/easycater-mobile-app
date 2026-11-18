@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { AfterViewInit, Component, OnInit, computed, effect, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 
@@ -18,7 +18,7 @@ import {
   templateUrl: './booking.page.html',
   styleUrls: ['./booking.page.scss'],
 })
-export class BookingPage implements OnInit {
+export class BookingPage implements OnInit, AfterViewInit {
   readonly eventTypes = [
     { key: 'wedding', label: 'Wedding' },
     { key: 'corporate', label: 'Corporate' },
@@ -40,6 +40,7 @@ export class BookingPage implements OnInit {
 
   /** Upcoming dates that already hold a booking - shown as fully booked. */
   readonly takenDates = signal<string[]>([]);
+  private calendarObserver: MutationObserver | null = null;
 
   /** Address is limited to the service area: barangays of General Tinio only. */
   readonly barangays = GENERAL_TINIO_BARANGAYS;
@@ -124,6 +125,54 @@ export class BookingPage implements OnInit {
     }
   }
 
+  /** Paint taken (fully booked) calendar days red so they stand out. */
+  ngAfterViewInit(): void {
+    effect(() => {
+      this.calendarKey();
+      setTimeout(() => {
+        this.watchCalendar();
+        this.paintTakenDays();
+      }, 150);
+    });
+  }
+
+  private paintTakenDays(): void {
+    const taken = new Set(this.takenDates());
+    const dt = document.querySelector('ion-datetime') as (HTMLElement & { shadowRoot: ShadowRoot }) | null;
+    const shadow = dt?.shadowRoot;
+    if (!shadow) return;
+    shadow.querySelectorAll<HTMLElement>('button.calendar-day:not(.calendar-day-padding)').forEach((el) => {
+      const dayNum = (el.textContent || '').trim();
+      const month = Number(el.getAttribute('data-month'));
+      const year = Number(el.getAttribute('data-year'));
+      if (!dayNum || Number.isNaN(month) || Number.isNaN(year)) return;
+      // data-month is 0-based inside ion-datetime
+      const iso = `${year}-${String(month + 1).padStart(2, '0')}-${dayNum.padStart(2, '0')}`;
+      if (taken.has(iso)) {
+        el.style.setProperty('background', '#e5484d');
+        el.style.setProperty('color', '#ffffff');
+        el.style.setProperty('border-radius', '50%');
+        el.style.setProperty('text-decoration', 'none');
+        el.style.setProperty('opacity', '1');
+      }
+    });
+  }
+
+  /** Re-attaches the repaint watcher to the CURRENT calendar (it gets
+   *  re-created whenever the taken dates or the booking window change).
+   *  Retries briefly because the datetime component renders late. */
+  private watchCalendar(attempt = 0): void {
+    const dt = document.querySelector('ion-datetime') as (HTMLElement & { shadowRoot: ShadowRoot }) | null;
+    if (!dt?.shadowRoot) {
+      if (attempt < 12) setTimeout(() => this.watchCalendar(attempt + 1), 300);
+      return;
+    }
+    if (this.calendarObserver) this.calendarObserver.disconnect();
+    this.calendarObserver = new MutationObserver(() => this.paintTakenDays());
+    this.calendarObserver.observe(dt.shadowRoot, { childList: true, subtree: true });
+    this.paintTakenDays();
+  }
+
   private syncFromDraft(): void {
     const draft = this.cart.state();
     this.eventType.set(draft.eventType);
@@ -137,7 +186,13 @@ export class BookingPage implements OnInit {
   }
 
   private loadTakenDates(): void {
-    this.bookingService.getTakenDates().subscribe((dates) => this.takenDates.set(dates));
+    this.bookingService.getTakenDates().subscribe((dates) => {
+      this.takenDates.set(dates);
+      setTimeout(() => {
+        this.watchCalendar();
+        this.paintTakenDays();
+      }, 150);
+    });
   }
 
   /** Error prevention: the calendar only offers valid dates (today + 7 days). */
