@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { IonMenu } from '@ionic/angular';
+import { AlertController, IonMenu } from '@ionic/angular';
 
 import { AuthService } from '../core/services/auth.service';
 
@@ -31,7 +31,10 @@ export class AdminShellPage {
     { path: '/reports', label: 'Reports', icon: 'bar-chart-outline' },
   ];
 
-  constructor(public auth: AuthService) {}
+  constructor(
+    public auth: AuthService,
+    private alert: AlertController
+  ) {}
 
   get adminName(): string {
     return this.auth.user()?.name ?? 'Administrator';
@@ -40,5 +43,18 @@ export class AdminShellPage {
   /** Closes the overlay menu on mobile once a link is tapped. */
   close(): void {
     void this.menu?.close();
+  }
+
+  /** Confirmation dialog before signing out - Cancel / Logout. */
+  async confirmLogout(): Promise<void> {
+    const alert = await this.alert.create({
+      header: 'Log out?',
+      message: 'You will need to sign in again to access the admin panel.',
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        { text: 'Logout', role: 'destructive', handler: () => this.auth.logout() },
+      ],
+    });
+    await alert.present();
   }
 }
