@@ -114,7 +114,7 @@ export class BookingsAdminPage implements OnInit {
   }
 
   private async notify(message: string): Promise<void> {
-    const t = await this.toast.create({ message, duration: 2200, position: 'bottom' });
+    const t = await this.toast.create({ message, duration: 2200, position: 'top' });
     await t.present();
   }
 }
