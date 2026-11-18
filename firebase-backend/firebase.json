@@ -1,0 +1,12 @@
+{
+  "functions": [{ "source": "functions", "runtime": "nodejs20" }],
+  "hosting": {
+    "public": "hosting-public",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      { "source": "/api/**", "function": "api" },
+      { "source": "/images/**", "function": "api" },
+      { "source": "/uploads/**", "function": "api" }
+    ]
+  }
+}
